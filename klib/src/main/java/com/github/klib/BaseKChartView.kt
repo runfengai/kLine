@@ -71,6 +71,23 @@ abstract class BaseKChartView : ScaleScrollView {
     //副图类型
     private var type: Int = TYPE_NULL_SUB
 
+    /**
+     * ========自定义属性=======START=============================================
+     */
+    /**
+     * boll线三个颜色
+     */
+    private var upColor: Int = 0
+    private var mbColor: Int = 0
+    private var dnColor: Int = 0
+    private var bollLineWidth = 0
+    private var bollTextSize = 12
+
+    /**
+     * =========自定义属性========END=============================================
+     */
+
+
     //float格式化
     val mValueFormatter: IValueFormatter = DefValueFormatter()
 
