@@ -1,4 +1,4 @@
-package com.github.klib
+package com.github.klib.entity
 
 /**
  * 自定义属性封装

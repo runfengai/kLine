@@ -10,9 +10,11 @@ import android.graphics.Rect
 import android.util.AttributeSet
 import com.github.klib.entity.DefValueFormatter
 import com.github.klib.entity.KEntity
+import com.github.klib.entity.KlineAttribute
 import com.github.klib.interfaces.IAdapter
 import com.github.klib.interfaces.IChartDraw
 import com.github.klib.interfaces.IValueFormatter
+import kotlin.math.round
 
 abstract class BaseKChartView : ScaleScrollView {
     companion object {
@@ -20,6 +22,9 @@ abstract class BaseKChartView : ScaleScrollView {
         const val TYPE_SUB = 0
         const val TYPE_NULL_SUB = -1
     }
+
+    //属性大全
+    protected var kLineAttribute = KlineAttribute()
 
     //宽高
     private var mWidth = 0
@@ -71,21 +76,6 @@ abstract class BaseKChartView : ScaleScrollView {
     //副图类型
     private var type: Int = TYPE_NULL_SUB
 
-    /**
-     * ========自定义属性=======START=============================================
-     */
-    /**
-     * boll线三个颜色
-     */
-    private var upColor: Int = 0
-    private var mbColor: Int = 0
-    private var dnColor: Int = 0
-    private var bollLineWidth = 0
-    private var bollTextSize = 12
-
-    /**
-     * =========自定义属性========END=============================================
-     */
 
 
     //float格式化
@@ -166,6 +156,8 @@ abstract class BaseKChartView : ScaleScrollView {
         mTranslateX = scrollX + getMinTranslateX()
     }
 
+    fun isFullScreen(): Boolean = mDataLen != 0 && mDataLen >= mWidth / mScaleX
+
     /**
      * 获取平移的最小值
      *
@@ -173,13 +165,19 @@ abstract class BaseKChartView : ScaleScrollView {
      * return -mDataLen + mWidth / mScaleX - mPointWidth / 2;
      * }
      */
-    private fun getMinTranslateX(): Float {
-        return -mDataLen + mWidth / mScaleX - mPointWidth / 2
+    private fun getMinTranslateX() = -mDataLen + mWidth / mScaleX - mPointWidth / 2
+
+
+    private fun getMaxTranslateX() = if (!isFullScreen()) {
+        getMinTranslateX()
+    } else {
+        (mPointWidth / 2).toFloat()
     }
 
     /**
      * 长按选中监听
      */
+
     interface OnSelectedChangeListener {
         fun onSelectedChanged(view: BaseKChartView, point: Any, index: Int)
     }
@@ -220,4 +218,10 @@ abstract class BaseKChartView : ScaleScrollView {
         return mAdapter?.getItem(position)
     }
 
+    /**
+     * 最小滚动长度
+     */
+    override fun getMinScrollX(): Int = -(mOverScrollRange / mScaleX).toInt()
+
+    override fun getMaxScrollX(): Int = round(getMaxTranslateX() - getMinTranslateX()).toInt()
 }

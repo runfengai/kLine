@@ -2,6 +2,9 @@ package com.github.klib.entity
 
 import java.util.*
 
+/**
+ * 对外暴露
+ */
 data class KEntity(
     /**
      * BOLL线上轨、中轨、下轨
