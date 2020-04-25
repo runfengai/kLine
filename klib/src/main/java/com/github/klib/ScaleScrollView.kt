@@ -10,7 +10,7 @@ import android.widget.RelativeLayout
 import androidx.core.view.GestureDetectorCompat
 import kotlin.math.roundToInt
 
-public abstract class ScaleScrollView : RelativeLayout, GestureDetector.OnGestureListener,
+abstract class ScaleScrollView : RelativeLayout, GestureDetector.OnGestureListener,
     ScaleGestureDetector.OnScaleGestureListener {
 
 
@@ -23,7 +23,7 @@ public abstract class ScaleScrollView : RelativeLayout, GestureDetector.OnGestur
         attrs,
         defStyleAttr
     ) {
-        init()
+        initDetector()
     }
 
     //手势检测
@@ -36,6 +36,8 @@ public abstract class ScaleScrollView : RelativeLayout, GestureDetector.OnGestur
     var inTouch: Boolean = false
     //长按类型
     var isLongPress: Boolean = false
+    //允许scale
+    var isScaleEnable: Boolean = true
     //允许scroll
     var isScrollEnable: Boolean = true
     //多指触控
@@ -47,7 +49,7 @@ public abstract class ScaleScrollView : RelativeLayout, GestureDetector.OnGestur
     protected var scaleMin: Float = 0.5f
     protected var scaleMax: Float = 2f
 
-    open fun init() {
+    fun initDetector() {
         setWillNotDraw(false)
         detector = GestureDetectorCompat(context, this)
         scaleDetector = ScaleGestureDetector(context, this)

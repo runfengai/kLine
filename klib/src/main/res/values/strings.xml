@@ -1,8 +1,15 @@
 <resources>
-    <string name="app_name">klib</string>
     <string-array name="unit">
         <item>K</item>
         <item>M</item>
         <item>B</item>
     </string-array>
+    <string name="kline_time">Time</string>
+    <string name="kline_open">Open</string>
+    <string name="kline_high">High</string>
+    <string name="kline_low">Low</string>
+    <string name="kline_close">Close</string>
+    <string name="kline_change">Change</string>
+    <string name="kline_change_p">Change%</string>
+    <string name="kline_amount">Amount</string>
 </resources>

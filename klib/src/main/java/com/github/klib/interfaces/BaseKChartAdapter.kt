@@ -11,7 +11,7 @@ abstract class BaseKChartAdapter<T> : IAdapter<T> {
     /**
      *
      */
-    fun notifyDataSetChanged() {
+    override fun notifyDataSetChanged() {
         if (getCount() > 0) {
             mDataSetObservable.notifyChanged()
         }
@@ -20,13 +20,12 @@ abstract class BaseKChartAdapter<T> : IAdapter<T> {
     /**
      *注册观察者
      */
-    fun registerDataSetObserver(dataSetObserver: DataSetObserver) {
+    override fun registerDataSetObserver(dataSetObserver: DataSetObserver) {
         mDataSetObservable.registerObserver(dataSetObserver)
     }
 
-    fun unRegisterDataSetObserver(dataSetObserver: DataSetObserver) {
+    override fun unRegisterDataSetObserver(dataSetObserver: DataSetObserver) {
         mDataSetObservable.unregisterObserver(dataSetObserver)
-
     }
 
 }

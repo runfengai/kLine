@@ -7,12 +7,7 @@ import com.github.klib.entity.KEntity
 import com.github.klib.interfaces.IChartDraw
 import com.github.klib.interfaces.IValueFormatter
 
-class BollView : IChartDraw<KEntity> {
-    private var baseKChartView: BaseKChartView
-
-    constructor(baseKChartView: BaseKChartView) {
-        this.baseKChartView = baseKChartView
-    }
+class BollView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity> {
 
     /**
      * 三个轨道

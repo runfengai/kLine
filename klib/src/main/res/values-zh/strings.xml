@@ -1,0 +1,10 @@
+<resources>
+    <string name="kline_time">时间</string>
+    <string name="kline_open">开</string>
+    <string name="kline_high">高</string>
+    <string name="kline_low">低</string>
+    <string name="kline_close">收</string>
+    <string name="kline_change">涨跌额</string>
+    <string name="kline_change_p">涨跌幅</string>
+    <string name="kline_amount">成交量</string>
+</resources>

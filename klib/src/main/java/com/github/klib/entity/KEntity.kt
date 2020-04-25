@@ -15,7 +15,8 @@ data class KEntity(
     /**
      * 蜡烛线
      */
-
+    var change: Float,//涨跌额
+    var changePercent: Float,//涨跌幅
     var open: Float,//开盘价
     var highest: Float,//最高价
     var lowest: Float,//最低价

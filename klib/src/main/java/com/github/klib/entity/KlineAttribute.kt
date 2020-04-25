@@ -4,20 +4,23 @@ package com.github.klib.entity
  * 自定义属性封装
  */
 data class KlineAttribute(
+    //总的
+    var candleUpColor: Int = 0,
+    var candleDownColor: Int = 0,
     var pointWidth: Float = 0f,
     var textSize: Float = 0f,
     var textColor: Int = 0,
-    var lineWidth: Float = 0f,
+    var lineWidth: Float = 0f,//细线
     var backgroundColor: Int = 0,
     var selectedLineColor: Int = 0,
     var selectedLineWidth: Float = 0f,
     var gridLineWidth: Float = 0f,
-    var gridLineColor: Float = 0f,
+    var gridLineColor: Int = 0,
     //macd
     var macdWidth: Float = 0f,
-    var difColor: Float = 0f,
-    var deaColor: Float = 0f,
-    var macdColor: Float = 0f,
+    var difColor: Int = 0,
+    var deaColor: Int = 0,
+    var macdColor: Int = 0,
     //kdj
     var kColor: Int = 0,
     var dColor: Int = 0,
@@ -38,5 +41,5 @@ data class KlineAttribute(
     var candleLineWidth: Float = 0f,
     var selectorBackgroundColor: Int = 0,
     var selectorTextSize: Float = 0f,
-    var candleSolid: Boolean = true//蜡烛是否空心
+    var candleSolid: Boolean = true//蜡烛是否实心,目前仅实心
 )

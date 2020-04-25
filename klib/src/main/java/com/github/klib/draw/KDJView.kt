@@ -1,11 +1,12 @@
 package com.github.klib.draw
 
 import android.graphics.Canvas
+import com.github.klib.BaseKChartView
 import com.github.klib.entity.KEntity
 import com.github.klib.interfaces.IChartDraw
 import com.github.klib.interfaces.IValueFormatter
 
-class KDJView: IChartDraw<KEntity> {
+class KDJView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntity> {
     override fun drawTranslated(
         lastPoint: KEntity,
         currPoint: KEntity,
