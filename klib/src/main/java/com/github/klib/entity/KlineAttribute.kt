@@ -16,6 +16,8 @@ data class KlineAttribute(
     var selectedLineWidth: Float = 0f,
     var gridLineWidth: Float = 0f,
     var gridLineColor: Int = 0,
+    var gridRows: Int = 5,//网格行数
+    var gridColumns: Int = 5,//网格列数
     //macd
     var macdWidth: Float = 0f,
     var difColor: Int = 0,

@@ -1,40 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="KChartView">
-        <attr name="pointWidth" format="dimension" />
-        <attr name="textSize" format="dimension" />
-        <attr name="textColor" format="color" />
-        <attr name="lineWidth" format="dimension" />
-        <attr name="backgroundColor" format="color" />
-        <attr name="selectedLineColor" format="color" />
-        <attr name="selectedLineWidth" format="dimension" />
-        <attr name="gridLineWidth" format="dimension" />
-        <attr name="gridLineColor" format="color" />
+        <attr name="pointWidth" format="dimension"/>
+        <attr name="textSize" format="dimension"/>
+        <attr name="textColor" format="color"/>
+        <attr name="lineWidth" format="dimension"/>
+        <attr name="backgroundColor" format="color"/>
+        <attr name="selectedLineColor" format="color"/>
+        <attr name="selectedLineWidth" format="dimension"/>
+        <attr name="gridLineWidth" format="dimension"/>
+        <attr name="gridLineColor" format="color"/>
         <!-- macd-->
-        <attr name="macdWidth" format="dimension" />
-        <attr name="difColor" format="dimension" />
-        <attr name="deaColor" format="dimension" />
-        <attr name="macdColor" format="dimension" />
+        <attr name="macdWidth" format="dimension"/>
+        <attr name="difColor" format="dimension"/>
+        <attr name="deaColor" format="dimension"/>
+        <attr name="macdColor" format="dimension"/>
         <!--kdj-->
-        <attr name="kColor" format="dimension" />
-        <attr name="dColor" format="dimension" />
-        <attr name="jColor" format="dimension" />
+        <attr name="kColor" format="dimension"/>
+        <attr name="dColor" format="dimension"/>
+        <attr name="jColor" format="dimension"/>
         <!--rsi-->
-        <attr name="rsi1Color" format="dimension" />
-        <attr name="rsi2Color" format="dimension" />
-        <attr name="rsi3Color" format="dimension" />
+        <attr name="rsi1Color" format="dimension"/>
+        <attr name="rsi2Color" format="dimension"/>
+        <attr name="rsi3Color" format="dimension"/>
         <!-- boll-->
-        <attr name="upColor" format="dimension" />
-        <attr name="mbColor" format="dimension" />
-        <attr name="dnColor" format="dimension" />
+        <attr name="upColor" format="dimension"/>
+        <attr name="mbColor" format="dimension"/>
+        <attr name="dnColor" format="dimension"/>
         <!--main-->
-        <attr name="ma5Color" format="dimension" />
-        <attr name="ma10Color" format="dimension" />
-        <attr name="ma30Color" format="dimension" />
-        <attr name="candleWidth" format="dimension" />
-        <attr name="candleLineWidth" format="dimension" />
-        <attr name="selectorBackgroundColor" format="dimension" />
-        <attr name="selectorTextSize" format="dimension" />
-        <attr name="candleSolid" format="dimension" />
+        <attr name="ma5Color" format="dimension"/>
+        <attr name="ma10Color" format="dimension"/>
+        <attr name="ma30Color" format="dimension"/>
+        <attr name="candleUpColor" format="color"/>
+        <attr name="candleDownColor" format="color"/>
+        <attr name="candleWidth" format="dimension"/>
+        <attr name="candleLineWidth" format="dimension"/>
+        <attr name="selectorBackgroundColor" format="dimension"/>
+        <attr name="selectorTextSize" format="dimension"/>
+        <attr name="candleSolid" format="dimension"/>
     </declare-styleable>
 </resources>

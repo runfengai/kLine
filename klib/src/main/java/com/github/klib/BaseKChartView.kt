@@ -18,6 +18,7 @@ import com.github.klib.interfaces.BaseKChartAdapter
 import com.github.klib.interfaces.IAdapter
 import com.github.klib.interfaces.IChartDraw
 import com.github.klib.interfaces.IValueFormatter
+import com.github.klib.util.DensityUtil
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.round
@@ -64,6 +65,8 @@ abstract class BaseKChartView : ScaleScrollView {
     private val mBackgroundPaint = Paint(ANTI_ALIAS_FLAG)
     //选中的k线高亮
     private val mSelectedLinePaint = Paint(ANTI_ALIAS_FLAG)
+    //选中的k线高亮
+    private val mSelectedCirclePaint = Paint(ANTI_ALIAS_FLAG)
 
     var mSelectedIndex: Int = 0
         private set
@@ -124,6 +127,10 @@ abstract class BaseKChartView : ScaleScrollView {
     private var mSubMaxVal = Float.MAX_VALUE
     private var mSubMinVal = Float.MIN_VALUE
 
+    private var selectorCircleRadius = 1f
+
+    val klineAttribute = KlineAttribute()
+
 
     private val mDataSetObserver = object : DataSetObserver() {
         override fun onChanged() {
@@ -144,7 +151,7 @@ abstract class BaseKChartView : ScaleScrollView {
         context,
         attr,
         defStyle
-    ){
+    ) {
         init()
     }
 
@@ -156,6 +163,8 @@ abstract class BaseKChartView : ScaleScrollView {
         mVolumeTopPadding = defPadding
         mSubTopPadding = defPadding
 //        mAnimator = ValueAnimator.ofFloat(0f, 1f)
+
+        selectorCircleRadius = DensityUtil.dip2px(context, 2f).toFloat()
     }
 
     /**
@@ -377,6 +386,12 @@ abstract class BaseKChartView : ScaleScrollView {
         drawGrid(canvas)
         drawK(canvas)
         drawText(canvas)
+        drawValue(canvas, if (isLongPress) mSelectedIndex else mStopIndex)
+        canvas.restore()
+    }
+
+    private fun drawValue(canvas: Canvas, i: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     /**
@@ -446,11 +461,81 @@ abstract class BaseKChartView : ScaleScrollView {
      * 绘制grid
      */
     private fun drawGrid(canvas: Canvas) {
+//        主图
+        val widthF = mWidth.toFloat()
+        val heightF = mHeight.toFloat()
+        val rowSpace = heightF / kLineAttribute.gridRows
+        for (i in 0 until kLineAttribute.gridRows) {
+            val startY = rowSpace * i + mMainRect.top.toFloat()
+            canvas.drawLine(0f, startY, widthF, startY, mGridPaint)
+        }
+
+        val columnSpace = widthF / kLineAttribute.gridColumns
+        for (i in 1 until kLineAttribute.gridColumns) {
+            val startX = columnSpace * i.toFloat()
+            canvas.drawLine(startX, 0f, startX, heightF, mGridPaint)
+        }
 
     }
 
     private fun drawK(canvas: Canvas) {
+        //保存之前的平移缩放
+        canvas.save()
+        if (!isFullScreen() || mItemCount == 1) {
+            mTranslateX = getInitialTranslateX()
+        }
+        canvas.translate(mTranslateX * mScaleX, 0f)
+        canvas.scale(mScaleX, 1f)
+        for (i in mStartIndex..mStopIndex) {
+            val currentPoint = getItem(i) ?: return
+            val currPointX = getXByIndex(i)
+            val lastPoint = if (i == 0) currentPoint else getItem(i - 1) ?: return
+            val lastPointX = if (i == 0) currPointX else getXByIndex(i - 1)
+            mMainView.drawTranslated(lastPoint, currentPoint, lastPointX, currPointX, canvas, i)
+            mVolumeDraws[0].drawTranslated(lastPoint, currentPoint, lastPointX, currPointX, canvas, i)
+            if (type != TYPE_NULL_SUB) {
+                mCurrSubDraw?.drawTranslated(lastPoint, currentPoint, lastPointX, currPointX, canvas, i)
+            }
+        }
+        //长按
+        if (isLongPress) {
+            val point = getItem(mSelectedIndex) ?: return
+            val x = getXByIndex(mSelectedIndex)
+            val y = getMainY(point.close)
+            canvas.drawLine(x, mMainRect.top.toFloat(), x, mVolumeRect.bottom.toFloat(), mSelectedLinePaint)
+            canvas.drawLine(-mTranslateX, y, -mTranslateX + mWidth / mScaleX, y, mSelectedLinePaint)
+            //todo 此处画两个圆
+            canvas.drawCircle(x, y, selectorCircleRadius, mSelectedCirclePaint)
+            if (type != TYPE_NULL_SUB) {
+                canvas.drawLine(
+                    x,
+                    (mSubRect.top - mSubTopPadding).toFloat(),
+                    x,
+                    mSubRect.bottom.toFloat(),
+                    mSelectedLinePaint
+                )
+            }
 
+        }
+        //还原平移缩放
+        canvas.restore()
+
+    }
+
+    /**
+     * 获取平移最小值
+     */
+    private fun getInitialTranslateX(): Float {
+        if (mWidth != 0 && mStopIndex >= 0) {
+            if (!isFullScreen()) {//左
+                val count = mStopIndex - mStartIndex + 1
+                if (count > 0) {//目的，显示不满屏，靠左显示
+                    val showWidth = count * mPointWidth
+                    return -mDataLen + mWidth / mScaleX - mPointWidth / 2 - (mWidth / mScaleX - showWidth)
+                }
+            }
+        }
+        return -mDataLen + mWidth / mScaleX - mPointWidth / 2
     }
 
     private fun drawText(canvas: Canvas) {
@@ -462,6 +547,33 @@ abstract class BaseKChartView : ScaleScrollView {
      */
     fun getMainY(value: Float): Float {
         return (mMainMaxVal - value) * mMainScaleY + mMainRect.top
+    }
+
+    fun setGridRows(r: Int) {
+        klineAttribute.gridRows = if (r < 1) {
+            1
+        } else r
+    }
+
+    fun setGridColumns(c: Int) {
+        klineAttribute.gridColumns = if (c < 1) {
+            1
+        } else c
+    }
+
+    /**
+     * 更新属性
+     */
+    fun updateKlineAttr() {
+        mSelectedLinePaint.color = kLineAttribute.selectedLineColor
+        mSelectedLinePaint.strokeWidth = klineAttribute.selectedLineWidth
+        mTextPaint.color = klineAttribute.textColor
+        mTextPaint.textSize = klineAttribute.textSize
+        mBackgroundPaint.color = klineAttribute.backgroundColor
+        mPointWidth = klineAttribute.pointWidth
+        mGridPaint.color = klineAttribute.gridLineColor
+        mGridPaint.strokeWidth = klineAttribute.gridLineWidth
+        mSelectedCirclePaint.color = klineAttribute.textColor
     }
 
 

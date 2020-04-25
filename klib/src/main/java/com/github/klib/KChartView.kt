@@ -17,8 +17,6 @@ class KChartView : BaseKChartView {
     private var isRefreshing = false
 //    private var isLoadMoreEnd = false
 
-    val klineAttribute = KlineAttribute()
-
     private var defM5Color: Int = 0
     private var defM10Color: Int = 0
     private var defM30Color: Int = 0
@@ -83,7 +81,6 @@ class KChartView : BaseKChartView {
 
         addChildDraw(mVolumeView)
 
-//        addChildChildDraw(mBollView)
         addChildChildDraw(mMacdView)
         addChildChildDraw(mKdjView)
         addChildChildDraw(mRsiView)
@@ -127,6 +124,8 @@ class KChartView : BaseKChartView {
             R.styleable.KChartView_candleLineWidth,
             getDimension(R.dimen.kline_candle_line_width)
         )
+        klineAttribute.candleUpColor=typedArray.getColor(R.styleable.KChartView_candleUpColor,getColor(R.color.kline_candle_up_color))
+        klineAttribute.candleDownColor=typedArray.getColor(R.styleable.KChartView_candleDownColor,getColor(R.color.kline_candle_down_color))
         klineAttribute.selectorBackgroundColor =
             typedArray.getColor(R.styleable.KChartView_selectorBackgroundColor, getColor(R.color.kline_selector))
         klineAttribute.selectorTextSize = typedArray.getDimension(
@@ -165,15 +164,9 @@ class KChartView : BaseKChartView {
         klineAttribute.dnColor = typedArray.getColor(R.styleable.KChartView_dnColor, defM30Color)
 
         typedArray.recycle()
+        updateKlineAttr()
     }
 
-    /**
-     *
-     */
-    override fun init() {
-        super.init()
-
-    }
 
     override fun onRightSide() {
 
