@@ -173,9 +173,9 @@ abstract class BaseKChartView : ScaleScrollView {
 
     fun notifyChanged() {
         if (mItemCount > 0) {
-            mDataLen = mPointWidth * (mItemCount - 1)
+            mDataLen = mPointWidth * mItemCount
             checkAndFixScrollX()
-            setTranslateXFromScrollX(mScrollX)
+            setTranslateXFromScrollX(mScrollX, true)
         } else {
             scrollX = 0
         }
@@ -186,7 +186,7 @@ abstract class BaseKChartView : ScaleScrollView {
         super.onSizeChanged(w, h, oldw, oldh)
         initRect(w, h)
 
-        setTranslateXFromScrollX(mScrollX)
+        setTranslateXFromScrollX(mScrollX, true)
     }
 
     /**
@@ -194,7 +194,7 @@ abstract class BaseKChartView : ScaleScrollView {
      */
     fun updateSize(w: Int, h: Int) {
         initRect(w, h)
-        setTranslateXFromScrollX(mScrollX)
+        setTranslateXFromScrollX(mScrollX, true)
         notifyChanged()
     }
 
@@ -239,13 +239,20 @@ abstract class BaseKChartView : ScaleScrollView {
     /**
      * scrollX 转换为 TranslateX
      *
-     * @param scrollX
+     * @param scrollX 距离
+     * @param needReLocate 初始页面，如果满屏，需要右移一段
      */
-    private fun setTranslateXFromScrollX(scrollX: Int) {
+    private fun setTranslateXFromScrollX(scrollX: Int, needReLocate: Boolean = false) {
         mTranslateX = scrollX + getMinTranslateX()
+//        if (needReLocate && isFullScreen()) {
+//            mScrollX = -width / 5
+//            mTranslateX -= width / 5
+//        }
     }
 
-    fun isFullScreen(): Boolean = mDataLen != 0f && mDataLen >= mWidth / mScaleX
+    private fun isFullScreen(): Boolean {
+        return mDataLen != 0f && mDataLen >= mWidth / mScaleX - mWidth / 5//固定的
+    }
 
     /**
      * 获取平移的最小值
@@ -254,13 +261,13 @@ abstract class BaseKChartView : ScaleScrollView {
      * return -mDataLen + mWidth / mScaleX - mPointWidth / 2;
      * }
      */
-    private fun getMinTranslateX() = -mDataLen + mWidth / mScaleX - mPointWidth / 2
+    private fun getMinTranslateX() = -mDataLen + mWidth / mScaleX  - mWidth / 5
 
 
     private fun getMaxTranslateX() = if (!isFullScreen()) {
         getMinTranslateX()
     } else {
-        mPointWidth / 2
+        0f
     }
 
     /**
@@ -480,7 +487,7 @@ abstract class BaseKChartView : ScaleScrollView {
         if (start >= end) return start
         if (end - start == 1) {
             val startVal = getXByIndex(start)
-            val endVal = getXByIndex(start)
+            val endVal = getXByIndex(end)
             return if (abs(translateX - startVal) < abs(translateX - endVal)) start else end
         }
         val mid = start + (end - start) / 2
@@ -522,7 +529,7 @@ abstract class BaseKChartView : ScaleScrollView {
     private fun drawK(canvas: Canvas) {
         //保存之前的平移缩放
         canvas.save()
-        if (!isFullScreen() || mItemCount == 1) {
+        if (!isFullScreen()) {
             mTranslateX = getInitialTranslateX()
         }
         canvas.translate(mTranslateX * mScaleX, 0f)
@@ -591,12 +598,11 @@ abstract class BaseKChartView : ScaleScrollView {
             if (!isFullScreen()) {//左
                 val count = mStopIndex - mStartIndex + 1
                 if (count > 0) {//目的，显示不满屏，靠左显示
-                    val showWidth = count * mPointWidth
-                    return -mDataLen + mWidth / mScaleX - mPointWidth / 2 - (mWidth / mScaleX - showWidth)
+                    return mPointWidth / 2
                 }
             }
         }
-        return -mDataLen + mWidth / mScaleX - mPointWidth / 2
+        return -mDataLen + mWidth / mScaleX + mPointWidth / 2
     }
 
     private fun drawText(canvas: Canvas) {

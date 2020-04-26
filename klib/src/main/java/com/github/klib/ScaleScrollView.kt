@@ -46,8 +46,8 @@ abstract class ScaleScrollView : RelativeLayout, GestureDetector.OnGestureListen
     protected var mScrollX: Int = 0
     //缩放比例
     protected var mScaleX: Float = 1f
-    protected var scaleMin: Float = 0.5f
-    protected var scaleMax: Float = 2f
+    protected var scaleMin: Float = 0.4f
+    protected var scaleMax: Float = 3f
 
 
     private fun initDetector() {
@@ -96,7 +96,7 @@ abstract class ScaleScrollView : RelativeLayout, GestureDetector.OnGestureListen
         }
         val oldX = mScrollX
         mScrollX = x
-        //todo 有问题
+        //todo
         if (mScrollX < getMinScrollX()) {
             mScrollX = getMinScrollX()
             onRightSide()

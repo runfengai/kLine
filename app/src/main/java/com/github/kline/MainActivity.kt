@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity() {
             val res = withContext(Dispatchers.IO) {
                 val sb = StringBuilder()
                 try {
+//                    val inputStream = InputStreamReader(resources.assets.open("kdata_less.json"))
                     val inputStream = InputStreamReader(resources.assets.open("kdata.json"))
                     val bufferedReader = BufferedReader(inputStream)
                     var line: String? = bufferedReader.readLine()

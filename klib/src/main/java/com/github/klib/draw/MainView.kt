@@ -141,18 +141,22 @@ class MainView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity>
         val close = baseKChartView.getMainY(currPoint.close)//上一个的收盘价
         val r = baseKChartView.klineAttribute.candleWidth / 2
         val lineR = baseKChartView.klineAttribute.candleLineWidth / 2
-        if (open > close) {//阴线
-//            if (baseKchartView.klineAttribute.candleSolid) {
-            //todo 搞
-            canvas.drawRect(currX - r, close, currX + r, open, candleDownPaint)
-            canvas.drawRect(currX - lineR, high, currX + lineR, low, candleDownPaint)
-//            }
-        } else if (open < close) {//阳
-            canvas.drawRect(currX - r, open, currX + r, close, candleUpPaint)
-            canvas.drawRect(currX - lineR, high, currX + lineR, low, candleUpPaint)
-        } else {
-            canvas.drawRect(currX - r, open, currX + r, close + 1, candleDownPaint)
-            canvas.drawRect(currX - lineR, high, currX + lineR, low, candleDownPaint)
+        when {
+            open > close -> {//阴线
+    //            if (baseKchartView.klineAttribute.candleSolid) {
+                //todo 搞
+                canvas.drawRect(currX - r, close, currX + r, open, candleDownPaint)
+                canvas.drawRect(currX - lineR, high, currX + lineR, low, candleDownPaint)
+    //            }
+            }
+            open < close -> {//阳
+                canvas.drawRect(currX - r, open, currX + r, close, candleUpPaint)
+                canvas.drawRect(currX - lineR, high, currX + lineR, low, candleUpPaint)
+            }
+            else -> {
+                canvas.drawRect(currX - r, open, currX + r, close + 1, candleDownPaint)
+                canvas.drawRect(currX - lineR, high, currX + lineR, low, candleDownPaint)
+            }
         }
 
 
