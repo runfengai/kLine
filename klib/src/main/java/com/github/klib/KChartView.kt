@@ -29,9 +29,9 @@ class KChartView : BaseKChartView {
     /**
      * 允许滑动、缩放
      */
-    //todo
-    private var mLastScrollEnable = false
-    private var mLastScaleEnable = false
+    //记录上次是否可以
+    private var mLastScrollEnable = true
+    private var mLastScaleEnable = true
 
     private var mLastType = TYPE_NULL_SUB
 

@@ -80,7 +80,7 @@ abstract class BaseKChartView : ScaleScrollView {
     private var mAnimator: ValueAnimator? = null
     private val animationDuration = 500L
     //???支持超屏拖动
-    private var mOverScrollRange = 40f
+    private var mOverScrollRange = 0f
 
     private var onSelectedChangeListener: OnSelectedChangeListener? = null
     /**
