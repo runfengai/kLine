@@ -1,9 +1,10 @@
 package com.github.kline
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.github.klib.KChartView
 import com.github.klib.entity.KEntity
+import com.github.kline.GlobalConstant.TAG_AN_HOUR
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
@@ -13,13 +14,10 @@ import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import java.io.BufferedReader
 import java.io.InputStreamReader
-import java.lang.StringBuilder
-import java.math.BigDecimal
-import java.util.*
-import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
     private var kChartView: KChartView? = null
+    private var adapter = KAdapter()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -42,46 +40,28 @@ class MainActivity : AppCompatActivity() {
                     sb.toString(),
                     object : TypeToken<ResponseEntity<KData>>() {}.type
                 )
-
                 //数据解析
                 val list = res?.data?.results
                 val arr = JSONArray(list)
-                kDataSuccess(arr, 1)
-                res
+                kDataSuccess(arr)
             }
+            kChartView?.setAdapter(adapter)
+            adapter.notify(res)
+            kChartView?.refreshComplete()
+
+
         }
     }
 
-    var type = 1
+    var type = TAG_AN_HOUR
     /**
      * 数据渲染
      */
-    private suspend fun kDataSuccess(obj: JSONArray, type: Int) {
+    private fun kDataSuccess(obj: JSONArray): java.util.ArrayList<KEntity> {
         val kData = DataParse()
         kData.parseKLine(obj, this.type)
-        val kLineDatas = kData.kLineDatas
-        if (kLineDatas.size > 0) {
-            var kLineEntities = ArrayList<KEntity>()
-            kLineEntities.clear()
-            //刷新下
-            for (i in kLineDatas.indices) {
-                val lineEntity = KEntity()
-                val kLineBean = kLineDatas.get(i)
-                lineEntity.dateTime = kLineBean.date
-                lineEntity.open = kLineBean.open
-                lineEntity.close = kLineBean.close
-                lineEntity.highest = kLineBean.high
-                lineEntity.lowest = kLineBean.low
-                lineEntity.volume = kLineBean.vol
-                kLineEntities.add(lineEntity)
-            }
-            kLineEntities = kData.getKlineDataByType(kLineEntities, this.type)
-            //
-            withContext(Dispatchers.Main) {
-                //                kLineEntities.value = kLineEntities
-            }
+        return kData.kLineDatas
 
-        }
     }
 
 }

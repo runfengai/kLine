@@ -5,6 +5,8 @@ import com.github.klib.BaseKChartView
 import com.github.klib.entity.KEntity
 import com.github.klib.interfaces.IChartDraw
 import com.github.klib.interfaces.IValueFormatter
+import kotlin.math.max
+import kotlin.math.min
 
 class KDJView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntity> {
     override fun drawTranslated(
@@ -15,23 +17,21 @@ class KDJView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntity> 
         canvas: Canvas,
         position: Int
     ) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     override fun drawText(canvas: Canvas, position: Int, x: Float, y: Float) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     override fun getMaxValue(point: KEntity): Float {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return max(point.k, max(point.d, point.j))
     }
 
     override fun getMinValue(point: KEntity): Float {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return min(point.k, min(point.d, point.j))
     }
 
-    override fun getValueFormatter(): IValueFormatter {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+
 
 }

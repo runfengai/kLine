@@ -6,12 +6,9 @@ import android.graphics.RectF
 import androidx.annotation.StringRes
 import com.github.klib.BaseKChartView
 import com.github.klib.R
-import com.github.klib.entity.DefValueFormatter
 import com.github.klib.entity.KEntity
 import com.github.klib.interfaces.IChartDraw
-import com.github.klib.interfaces.IValueFormatter
 import com.github.klib.util.DensityUtil
-import java.lang.StringBuilder
 import kotlin.math.max
 import kotlin.math.min
 
@@ -21,22 +18,22 @@ import kotlin.math.min
 class MainView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity> {
 
     private fun setAttr(baseKChartView: BaseKChartView) {
-        candleUpPaint.color = baseKChartView.kLineAttribute.candleUpColor
-        candleDownPaint.color = baseKChartView.kLineAttribute.candleUpColor
-        selectorTextPaint.color = baseKChartView.kLineAttribute.textColor
-        selectorFramePaint.color = baseKChartView.kLineAttribute.textColor
+        candleUpPaint.color = baseKChartView.klineAttribute.candleUpColor
+        candleDownPaint.color = baseKChartView.klineAttribute.candleDownColor
+        selectorTextPaint.color = baseKChartView.klineAttribute.textColor
+        selectorFramePaint.color = baseKChartView.klineAttribute.textColor
         selectorFramePaint.style = Paint.Style.STROKE
 
-        ma5Paint.color = baseKChartView.kLineAttribute.ma5Color
-        ma10Paint.color = baseKChartView.kLineAttribute.ma10Color
-        ma30Paint.color = baseKChartView.kLineAttribute.ma30Color
-        selectorTextPaint.color = baseKChartView.kLineAttribute.textColor
-        selectorTextPaint.textSize = baseKChartView.kLineAttribute.textSize
-        selectorBackgroundPaint.color = baseKChartView.kLineAttribute.selectorBackgroundColor
+        ma5Paint.color = baseKChartView.klineAttribute.ma5Color
+        ma10Paint.color = baseKChartView.klineAttribute.ma10Color
+        ma30Paint.color = baseKChartView.klineAttribute.ma30Color
+        selectorTextPaint.color = baseKChartView.klineAttribute.textColor
+        selectorTextPaint.textSize = baseKChartView.klineAttribute.textSize
+        selectorBackgroundPaint.color = baseKChartView.klineAttribute.selectorBackgroundColor
 
-        ma5Paint.strokeWidth = baseKChartView.kLineAttribute.lineWidth
-        ma10Paint.strokeWidth = baseKChartView.kLineAttribute.lineWidth
-        ma30Paint.strokeWidth = baseKChartView.kLineAttribute.lineWidth
+        ma5Paint.strokeWidth = baseKChartView.klineAttribute.lineWidth
+        ma10Paint.strokeWidth = baseKChartView.klineAttribute.lineWidth
+        ma30Paint.strokeWidth = baseKChartView.klineAttribute.lineWidth
     }
 
     //跌时蜡烛颜色（默认红）
@@ -142,10 +139,10 @@ class MainView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity>
         val low = baseKChartView.getMainY(currPoint.lowest)
         val open = baseKChartView.getMainY(currPoint.open)//开盘价
         val close = baseKChartView.getMainY(currPoint.close)//上一个的收盘价
-        val r = baseKChartView.kLineAttribute.candleWidth / 2
-        val lineR = baseKChartView.kLineAttribute.candleLineWidth / 2
+        val r = baseKChartView.klineAttribute.candleWidth / 2
+        val lineR = baseKChartView.klineAttribute.candleLineWidth / 2
         if (open > close) {//阴线
-//            if (baseKchartView.kLineAttribute.candleSolid) {
+//            if (baseKchartView.klineAttribute.candleSolid) {
             //todo 搞
             canvas.drawRect(currX - r, close, currX + r, open, candleDownPaint)
             canvas.drawRect(currX - lineR, high, currX + lineR, low, candleDownPaint)
@@ -251,10 +248,10 @@ class MainView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity>
                 redX += selectorFramePaint.measureText(textLeft)
                 val value = it[1] as Float
                 selectorFramePaint.color =
-                    if (value > 0f) baseKChartView.kLineAttribute.candleUpColor else baseKChartView.kLineAttribute.candleDownColor
+                    if (value > 0f) baseKChartView.klineAttribute.candleUpColor else baseKChartView.klineAttribute.candleDownColor
                 canvas.drawText("${it[1]}", redX, redY, selectorFramePaint)
             } else {
-                selectorFramePaint.color = baseKChartView.kLineAttribute.textColor
+                selectorFramePaint.color = baseKChartView.klineAttribute.textColor
                 val text = "${it[0]}${sb}${it[1]}"
                 canvas.drawText(text, x + padding, y, selectorFramePaint)
                 y += textHeight + padding
@@ -287,7 +284,6 @@ class MainView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity>
         }
     }
 
-    override fun getValueFormatter(): IValueFormatter = DefValueFormatter()
 
     init {
         setAttr(baseKChartView)

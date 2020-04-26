@@ -1,6 +1,7 @@
 package com.github.klib.interfaces
 
 import android.graphics.Canvas
+import com.github.klib.entity.DefValueFormatter
 
 /**
  *
@@ -28,6 +29,8 @@ interface IChartDraw<T> {
 
     fun getMinValue(point: T): Float
 
-    fun getValueFormatter(): IValueFormatter
+    fun getValueFormatter(): IValueFormatter{
+        return DefValueFormatter()
+    }
 
 }

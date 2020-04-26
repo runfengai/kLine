@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="kline_text_color">#B1B2B6</color>
-    <color name="kline_background">#202326</color>
-    <color name="kline_grid_line">#353941</color>
+    <color name="kline_background">#0A1C30</color>
+    <color name="kline_grid_line">#172A40</color>
 
     <color name="kline_ma5">#18CCF6</color>
     <color name="kline_ma10">#FE5EDF</color>

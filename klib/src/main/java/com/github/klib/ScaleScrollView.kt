@@ -49,6 +49,7 @@ abstract class ScaleScrollView : RelativeLayout, GestureDetector.OnGestureListen
     protected var scaleMin: Float = 0.5f
     protected var scaleMax: Float = 2f
 
+
     fun initDetector() {
         setWillNotDraw(false)
         detector = GestureDetectorCompat(context, this)

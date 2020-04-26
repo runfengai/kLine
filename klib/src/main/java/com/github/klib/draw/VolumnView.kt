@@ -2,9 +2,12 @@ package com.github.klib.draw
 
 import android.graphics.Canvas
 import com.github.klib.BaseKChartView
+import com.github.klib.entity.BigValueFormatter
 import com.github.klib.entity.KEntity
 import com.github.klib.interfaces.IChartDraw
 import com.github.klib.interfaces.IValueFormatter
+import kotlin.math.max
+import kotlin.math.min
 
 class VolumnView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntity> {
     override fun drawTranslated(
@@ -15,23 +18,23 @@ class VolumnView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntit
         canvas: Canvas,
         position: Int
     ) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     override fun drawText(canvas: Canvas, position: Int, x: Float, y: Float) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     override fun getMaxValue(point: KEntity): Float {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return max(point.volume, max(point.ma5Volume, point.ma10Volume))
     }
 
     override fun getMinValue(point: KEntity): Float {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return min(point.volume, min(point.ma5Volume, point.ma10Volume))
     }
 
     override fun getValueFormatter(): IValueFormatter {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return BigValueFormatter(baseKchartView.context)
     }
 
 }

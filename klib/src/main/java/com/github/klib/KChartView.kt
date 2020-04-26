@@ -4,11 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.ProgressBar
-import androidx.annotation.ColorRes
-import androidx.annotation.DimenRes
-import androidx.core.content.ContextCompat
 import com.github.klib.draw.*
-import com.github.klib.entity.KlineAttribute
 import com.github.klib.util.DensityUtil
 
 class KChartView : BaseKChartView {
@@ -79,11 +75,11 @@ class KChartView : BaseKChartView {
         mRsiView = RSIView(this)
         mVolumeView = VolumnView(this)
 
-        addChildDraw(mVolumeView)
+        addVolumeDraw(mVolumeView)
 
-        addChildChildDraw(mMacdView)
-        addChildChildDraw(mKdjView)
-        addChildChildDraw(mRsiView)
+        addSubDraw(mMacdView)
+        addSubDraw(mKdjView)
+        addSubDraw(mRsiView)
 
 
     }

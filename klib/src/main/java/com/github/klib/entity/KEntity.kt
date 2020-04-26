@@ -44,6 +44,12 @@ open class KEntity(
     var avgPrice: Float = 0f,//均价
     var price: Float = 0f,//成交价
     var date: Date = Date(),//时间
-    var volume: Float = 0f//成交量
+    var volume: Float = 0f,//成交量
+    var ma5Volume: Float = 0f,//成交量
+    var ma10Volume: Float = 0f,//成交量
+
+    var rsi1: Float = 0f,
+    var rsi2: Float = 0f,
+    var rsi3: Float = 0f//rsi指标
 
 )

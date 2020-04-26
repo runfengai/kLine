@@ -2,11 +2,14 @@ package com.github.klib.draw
 
 import android.graphics.Canvas
 import com.github.klib.BaseKChartView
+import com.github.klib.entity.DefValueFormatter
 import com.github.klib.entity.KEntity
 import com.github.klib.interfaces.IChartDraw
 import com.github.klib.interfaces.IValueFormatter
+import kotlin.math.max
+import kotlin.math.min
 
-class RSIView(private var baseKchartView: BaseKChartView): IChartDraw<KEntity> {
+class RSIView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntity> {
     override fun drawTranslated(
         lastPoint: KEntity,
         currPoint: KEntity,
@@ -15,23 +18,20 @@ class RSIView(private var baseKchartView: BaseKChartView): IChartDraw<KEntity> {
         canvas: Canvas,
         position: Int
     ) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     override fun drawText(canvas: Canvas, position: Int, x: Float, y: Float) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     override fun getMaxValue(point: KEntity): Float {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return max(point.rsi1, max(point.rsi2, point.rsi3))
     }
 
     override fun getMinValue(point: KEntity): Float {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return min(point.rsi1, min(point.rsi2, point.rsi3))
     }
 
-    override fun getValueFormatter(): IValueFormatter {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 
 }

@@ -21,6 +21,7 @@ import com.github.klib.interfaces.IValueFormatter
 import com.github.klib.util.DensityUtil
 import kotlin.math.abs
 import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.round
 
 abstract class BaseKChartView : ScaleScrollView {
@@ -30,8 +31,6 @@ abstract class BaseKChartView : ScaleScrollView {
         const val TYPE_NULL_SUB = -1//无副图
     }
 
-    //属性大全
-    var kLineAttribute = KlineAttribute()
 
     //宽高
     var mWidth = 0
@@ -48,9 +47,9 @@ abstract class BaseKChartView : ScaleScrollView {
     //子图最大
     private var mMainScaleY: Float = 1f
 
-    private val mChildScaleY = 1f
+    private var mVolumeScaleY = 1f
 
-    private val mChildChildScaleY = 1f
+    private var mSubScaleY = 1f
     //mb等值
     private var mChildMaxValue = Int.MAX_VALUE
     private var mChildMinValue = Int.MIN_VALUE
@@ -101,7 +100,7 @@ abstract class BaseKChartView : ScaleScrollView {
     /**
      * volume图，内部可能包含kdj啥的
      */
-    private val mVolumeDraws = mutableListOf<IChartDraw<KEntity>>()
+    private lateinit var mVolumeView: IChartDraw<KEntity>
     /**
      * 副图各种指标
      */
@@ -181,7 +180,6 @@ abstract class BaseKChartView : ScaleScrollView {
             scrollX = 0
         }
         invalidate()
-        requestLayout()
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -216,7 +214,8 @@ abstract class BaseKChartView : ScaleScrollView {
         var volumeH = (showHeight * 0.2f).toInt()
         val subH = (showHeight * 0.2f).toInt()
         if (type != TYPE_NULL_SUB) {//有副图
-            mSubRect = Rect(0, mVolumeRect.bottom + mSubTopPadding, mWidth, mVolumeRect.bottom + subH)
+            mSubRect =
+                Rect(0, mVolumeRect.bottom + mSubTopPadding, mWidth, mVolumeRect.bottom + subH)
         } else {
             mainH = (showHeight * 0.75f).toInt()
             volumeH = (showHeight * 0.25f).toInt()
@@ -290,7 +289,7 @@ abstract class BaseKChartView : ScaleScrollView {
      * 根据x,算出y
      */
     fun getChildY(value: Float): Float {
-        return (mChildMaxValue - value) * mChildScaleY + mVolumeRect.top
+        return (mChildMaxValue - value) * mVolumeScaleY + mVolumeRect.top
     }
 
     /**
@@ -322,12 +321,12 @@ abstract class BaseKChartView : ScaleScrollView {
 
     override fun getMaxScrollX(): Int = round(getMaxTranslateX() - getMinTranslateX()).toInt()
 
-
-    fun addChildDraw(item: IChartDraw<KEntity>) {
-        mVolumeDraws.add(item)
+    //
+    fun addVolumeDraw(item: IChartDraw<KEntity>) {
+        mVolumeView = item
     }
 
-    fun addChildChildDraw(item: IChartDraw<KEntity>) {
+    fun addSubDraw(item: IChartDraw<KEntity>) {
         mSubDraws.add(item)
     }
 
@@ -391,7 +390,7 @@ abstract class BaseKChartView : ScaleScrollView {
     }
 
     private fun drawValue(canvas: Canvas, i: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     /**
@@ -416,8 +415,50 @@ abstract class BaseKChartView : ScaleScrollView {
             val item = getItem(i)
             item?.apply {
                 mMainMaxVal = max(mMainMaxVal, mMainView.getMaxValue(this))
+                mMainMinVal = min(mMainMinVal, mMainView.getMinValue(this))
+
+                mVolumeMaxVal = max(mVolumeMaxVal, mVolumeView.getMaxValue(this))
+                mVolumeMinVal = min(mVolumeMinVal, mVolumeView.getMinValue(this))
+                mCurrSubDraw?.let {
+                    mSubMaxVal = max(mSubMaxVal, it.getMaxValue(this))
+                    mSubMinVal = min(mSubMinVal, it.getMinValue(this))
+                }
             }
         }
+        //主图
+        if (mMainMaxVal > mMainMinVal) {
+            val pdd = (mMainMaxVal - mMainMinVal) * 0.05f
+            mMainMaxVal += pdd
+            mMainMinVal -= pdd
+        } else if (mMainMaxVal == mMainMinVal) {
+            val pdd = mMainMaxVal * 0.05f
+            mMainMaxVal += pdd
+            mMainMinVal -= pdd
+            if (mMainMaxVal == 0f) {
+                mMainMaxVal = 1f
+            }
+        }
+
+        if (mVolumeMaxVal == mVolumeMinVal) {
+            val pdd = mVolumeMaxVal * 0.05f
+            mVolumeMaxVal += pdd
+            mVolumeMinVal -= pdd
+            if (mVolumeMaxVal == 0f) mVolumeMaxVal = 1f
+        }
+
+        if (type != TYPE_NULL_SUB) {//副图
+            mCurrSubDraw?.let {
+                if (mSubMaxVal == mSubMinVal) {
+                    val pdd = mSubMaxVal * 0.05f
+                    mSubMaxVal += pdd
+                    mSubMinVal -= pdd
+                    if (mSubMaxVal == 0f) mSubMaxVal = 1f
+                }
+                mVolumeScaleY = mSubRect.height() * 1f / (mSubMaxVal - mSubMinVal)
+            }
+        }
+        mMainScaleY = mMainRect.height() * 1f / (mMainMaxVal - mMainMinVal)
+        mVolumeScaleY = mVolumeRect.height() * 1f / (mVolumeMaxVal - mVolumeMinVal)
 
     }
 
@@ -464,14 +505,14 @@ abstract class BaseKChartView : ScaleScrollView {
 //        主图
         val widthF = mWidth.toFloat()
         val heightF = mHeight.toFloat()
-        val rowSpace = heightF / kLineAttribute.gridRows
-        for (i in 0 until kLineAttribute.gridRows) {
+        val rowSpace = heightF / klineAttribute.gridRows
+        for (i in 0 until klineAttribute.gridRows) {
             val startY = rowSpace * i + mMainRect.top.toFloat()
             canvas.drawLine(0f, startY, widthF, startY, mGridPaint)
         }
 
-        val columnSpace = widthF / kLineAttribute.gridColumns
-        for (i in 1 until kLineAttribute.gridColumns) {
+        val columnSpace = widthF / klineAttribute.gridColumns
+        for (i in 1 until klineAttribute.gridColumns) {
             val startX = columnSpace * i.toFloat()
             canvas.drawLine(startX, 0f, startX, heightF, mGridPaint)
         }
@@ -492,9 +533,23 @@ abstract class BaseKChartView : ScaleScrollView {
             val lastPoint = if (i == 0) currentPoint else getItem(i - 1) ?: return
             val lastPointX = if (i == 0) currPointX else getXByIndex(i - 1)
             mMainView.drawTranslated(lastPoint, currentPoint, lastPointX, currPointX, canvas, i)
-            mVolumeDraws[0].drawTranslated(lastPoint, currentPoint, lastPointX, currPointX, canvas, i)
+            mVolumeView.drawTranslated(
+                lastPoint,
+                currentPoint,
+                lastPointX,
+                currPointX,
+                canvas,
+                i
+            )
             if (type != TYPE_NULL_SUB) {
-                mCurrSubDraw?.drawTranslated(lastPoint, currentPoint, lastPointX, currPointX, canvas, i)
+                mCurrSubDraw?.drawTranslated(
+                    lastPoint,
+                    currentPoint,
+                    lastPointX,
+                    currPointX,
+                    canvas,
+                    i
+                )
             }
         }
         //长按
@@ -502,7 +557,13 @@ abstract class BaseKChartView : ScaleScrollView {
             val point = getItem(mSelectedIndex) ?: return
             val x = getXByIndex(mSelectedIndex)
             val y = getMainY(point.close)
-            canvas.drawLine(x, mMainRect.top.toFloat(), x, mVolumeRect.bottom.toFloat(), mSelectedLinePaint)
+            canvas.drawLine(
+                x,
+                mMainRect.top.toFloat(),
+                x,
+                mVolumeRect.bottom.toFloat(),
+                mSelectedLinePaint
+            )
             canvas.drawLine(-mTranslateX, y, -mTranslateX + mWidth / mScaleX, y, mSelectedLinePaint)
             //todo 此处画两个圆
             canvas.drawCircle(x, y, selectorCircleRadius, mSelectedCirclePaint)
@@ -565,7 +626,7 @@ abstract class BaseKChartView : ScaleScrollView {
      * 更新属性
      */
     fun updateKlineAttr() {
-        mSelectedLinePaint.color = kLineAttribute.selectedLineColor
+        mSelectedLinePaint.color = klineAttribute.selectedLineColor
         mSelectedLinePaint.strokeWidth = klineAttribute.selectedLineWidth
         mTextPaint.color = klineAttribute.textColor
         mTextPaint.textSize = klineAttribute.textSize
