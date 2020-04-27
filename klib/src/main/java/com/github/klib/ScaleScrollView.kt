@@ -2,6 +2,7 @@ package com.github.klib
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
@@ -81,11 +82,13 @@ abstract class ScaleScrollView : RelativeLayout, GestureDetector.OnGestureListen
 
     override fun setScrollX(scrollX: Int) {
         this.mScrollX = scrollX
+        Log.e("kline","===>setScrollX()   x=$mScrollX")
         scrollTo(mScrollX, 0)
     }
 
 
     override fun scrollBy(x: Int, y: Int) {
+        Log.e("kline","===>scrollBy()   x=${mScrollX - (x / mScaleX).roundToInt()}")
         scrollTo(mScrollX - (x / mScaleX).roundToInt(), 0)
     }
 
@@ -96,12 +99,14 @@ abstract class ScaleScrollView : RelativeLayout, GestureDetector.OnGestureListen
         }
         val oldX = mScrollX
         mScrollX = x
+        Log.e("kline","mScrollX=======>$mScrollX  oldX=$oldX ")
         //todo
         if (mScrollX < getMinScrollX()) {
             mScrollX = getMinScrollX()
             onRightSide()
             overScroller.forceFinished(true)
         } else if (mScrollX > getMaxScrollX()) {
+            Log.e("kline","mScrollX > getMaxScrollX()=======>${getMaxScrollX()}  mScrollX=$mScrollX  ")
             mScrollX = getMaxScrollX()
             onLeftSide()
             overScroller.forceFinished(true)
@@ -113,6 +118,7 @@ abstract class ScaleScrollView : RelativeLayout, GestureDetector.OnGestureListen
     override fun computeScroll() {
         if (overScroller.computeScrollOffset()) {
             if (!inTouch) {
+                Log.e("kline","===>computeScroll()   overScroller.currX=${overScroller.currX}")
                 scrollTo(overScroller.currX, overScroller.currY)
             } else {
                 overScroller.forceFinished(true)

@@ -20,15 +20,18 @@ class BigValueFormatter : IValueFormatter {
 
     override fun format(value: Float): String {
         var unit = ""
+        var valueF = value
         var i = values.size - 1
         while (i >= 0) {
-            if (value > values[i]) {
+            if (valueF > values[i]) {
+                valueF /= values[i]
                 unit = units[i]
                 break
             }
+            i--
         }
 
-        return String.format(Locale.getDefault(), "%.2f", value) + unit
+        return String.format(Locale.getDefault(), "%.2f%s", valueF, unit)
     }
 
 }

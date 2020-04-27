@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="kline_point_width">6dp</dimen>
+    <dimen name="kline_point_width">10dp</dimen>
     <dimen name="kline_text_size">10sp</dimen>
     <dimen name="kline_line_width">0.5dp</dimen>
     <dimen name="kline_grid_line_width">1dp</dimen>
     <dimen name="kline_selected_line_width">2dp</dimen>
-    <dimen name="kline_candle_width">6dp</dimen>
+    <dimen name="kline_candle_width">8dp</dimen>
     <dimen name="kline_candle_line_width">1dp</dimen>
     <dimen name="kline_selector_text_size">12sp</dimen>
     <dimen name="kline_padding">15dp</dimen>
+    <dimen name="kline_top_margin">30dp</dimen>
 </resources>

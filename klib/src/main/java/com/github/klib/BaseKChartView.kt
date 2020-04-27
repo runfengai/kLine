@@ -40,6 +40,7 @@ abstract class BaseKChartView : ScaleScrollView {
     //各种padding
     var mTopPadding = 0
         private set
+    var mTopMargin = 60
     var mBottomPadding = 0
         private set
     private var mVolumeTopPadding = 0
@@ -55,7 +56,7 @@ abstract class BaseKChartView : ScaleScrollView {
     private var mChildMinValue = Int.MIN_VALUE
 
     //点的宽度
-    private var mPointWidth = 6f
+    private var mPointWidth = 10f
     //网格线
     private val mGridPaint = Paint(ANTI_ALIAS_FLAG)
     //文字
@@ -128,6 +129,11 @@ abstract class BaseKChartView : ScaleScrollView {
 
     private var selectorCircleRadius = 1f
 
+    /**
+     * grid线的行间距
+     */
+    private var rowSpace: Float = 0f
+
     val klineAttribute = KlineAttribute()
 
 
@@ -164,6 +170,8 @@ abstract class BaseKChartView : ScaleScrollView {
 //        mAnimator = ValueAnimator.ofFloat(0f, 1f)
 
         selectorCircleRadius = DensityUtil.dip2px(context, 2f).toFloat()
+
+        mTopMargin = getDimension(R.dimen.kline_top_margin).toInt()
     }
 
     /**
@@ -175,7 +183,7 @@ abstract class BaseKChartView : ScaleScrollView {
         if (mItemCount > 0) {
             mDataLen = mPointWidth * mItemCount
             checkAndFixScrollX()
-            setTranslateXFromScrollX(mScrollX, true)
+            setTranslateXFromScrollX(mScrollX)
         } else {
             scrollX = 0
         }
@@ -186,7 +194,7 @@ abstract class BaseKChartView : ScaleScrollView {
         super.onSizeChanged(w, h, oldw, oldh)
         initRect(w, h)
 
-        setTranslateXFromScrollX(mScrollX, true)
+        setTranslateXFromScrollX(mScrollX)
     }
 
     /**
@@ -194,7 +202,7 @@ abstract class BaseKChartView : ScaleScrollView {
      */
     fun updateSize(w: Int, h: Int) {
         initRect(w, h)
-        setTranslateXFromScrollX(mScrollX, true)
+        setTranslateXFromScrollX(mScrollX)
         notifyChanged()
     }
 
@@ -208,21 +216,25 @@ abstract class BaseKChartView : ScaleScrollView {
     private fun initRect(w: Int, h: Int) {
         mWidth = w
         mHeight = h
-        val showHeight = h - mTopPadding - mBottomPadding
+        val showHeight = h - mTopPadding - mBottomPadding - mTopMargin
         //默认有副图
         var mainH = (showHeight * 0.6f).toInt()
         var volumeH = (showHeight * 0.2f).toInt()
         val subH = (showHeight * 0.2f).toInt()
         if (type != TYPE_NULL_SUB) {//有副图
+            mMainRect = Rect(0, mTopPadding + mTopMargin, mWidth, mTopPadding + mTopMargin + mainH)
+            mVolumeRect =
+                Rect(0, mMainRect.bottom + mVolumeTopPadding, mWidth, mMainRect.bottom + volumeH)
             mSubRect =
                 Rect(0, mVolumeRect.bottom + mSubTopPadding, mWidth, mVolumeRect.bottom + subH)
         } else {
             mainH = (showHeight * 0.75f).toInt()
             volumeH = (showHeight * 0.25f).toInt()
+            mMainRect = Rect(0, mTopPadding + mTopMargin, mWidth, mTopPadding + mTopMargin + mainH)
+            mVolumeRect =
+                Rect(0, mMainRect.bottom + mVolumeTopPadding, mWidth, mMainRect.bottom + volumeH)
         }
-        mMainRect = Rect(0, mTopPadding, mWidth, mTopPadding + mainH)
-        mVolumeRect =
-            Rect(0, mMainRect.bottom + mVolumeTopPadding, mWidth, mMainRect.bottom + volumeH)
+
     }
 
     override fun onScrollChanged(l: Int, t: Int, oldl: Int, oldt: Int) {
@@ -242,7 +254,7 @@ abstract class BaseKChartView : ScaleScrollView {
      * @param scrollX 距离
      * @param needReLocate 初始页面，如果满屏，需要右移一段
      */
-    private fun setTranslateXFromScrollX(scrollX: Int, needReLocate: Boolean = false) {
+    private fun setTranslateXFromScrollX(scrollX: Int) {
         mTranslateX = scrollX + getMinTranslateX()
 //        if (needReLocate && isFullScreen()) {
 //            mScrollX = -width / 5
@@ -261,7 +273,7 @@ abstract class BaseKChartView : ScaleScrollView {
      * return -mDataLen + mWidth / mScaleX - mPointWidth / 2;
      * }
      */
-    private fun getMinTranslateX() = -mDataLen + mWidth / mScaleX  - mWidth / 5
+    private fun getMinTranslateX() = -mDataLen + mWidth / mScaleX + mPointWidth / 2 - mWidth / 5 / mScaleX
 
 
     private fun getMaxTranslateX() = if (!isFullScreen()) {
@@ -505,6 +517,7 @@ abstract class BaseKChartView : ScaleScrollView {
         return index * mPointWidth
     }
 
+
     /**
      * 绘制grid
      */
@@ -512,8 +525,8 @@ abstract class BaseKChartView : ScaleScrollView {
 //        主图
         val widthF = mWidth.toFloat()
         val heightF = mHeight.toFloat()
-        val rowSpace = heightF / klineAttribute.gridRows
-        for (i in 0 until klineAttribute.gridRows) {
+        rowSpace = (heightF - mTopPadding - mTopMargin - mBottomPadding) / klineAttribute.gridRows
+        for (i in 0..klineAttribute.gridRows) {
             val startY = rowSpace * i + mMainRect.top.toFloat()
             canvas.drawLine(0f, startY, widthF, startY, mGridPaint)
         }
@@ -521,7 +534,7 @@ abstract class BaseKChartView : ScaleScrollView {
         val columnSpace = widthF / klineAttribute.gridColumns
         for (i in 1 until klineAttribute.gridColumns) {
             val startX = columnSpace * i.toFloat()
-            canvas.drawLine(startX, 0f, startX, heightF, mGridPaint)
+            canvas.drawLine(startX, 0f, startX, heightF - mBottomPadding, mGridPaint)
         }
 
     }
@@ -605,7 +618,63 @@ abstract class BaseKChartView : ScaleScrollView {
         return -mDataLen + mWidth / mScaleX + mPointWidth / 2
     }
 
+    /**
+     * 画右侧数值
+     */
     private fun drawText(canvas: Canvas) {
+        val metrics = mTextPaint.fontMetrics
+        val textHeight = metrics.descent - metrics.ascent
+        val pdd = metrics.bottom
+        val baselineH = (textHeight - metrics.bottom - metrics.top) / 2
+        val mainRow = max(
+            if (type == TYPE_NULL_SUB) klineAttribute.gridRows
+            else klineAttribute.gridRows - 1, 2
+        )
+        val betweenItem = (mMainMaxVal - mMainMinVal) / (mainRow - 1)
+        val textWidth = mTextPaint.measureText(formatValue(mMainMaxVal))
+        /**
+         * ----------画主图数值----------
+         */
+        for (i in 0 until mainRow) {
+            val text = formatValue(mMainMaxVal - i * betweenItem)
+            canvas.drawText(text, mWidth - textWidth, mMainRect.top - textHeight + i * rowSpace, mTextPaint)
+        }
+        /**
+         * ----------画Volume数值----------
+         */
+        val vol = mVolumeView.getValueFormatter().format(mVolumeMaxVal)
+        canvas.drawText(
+            vol,
+            mWidth - mTextPaint.measureText(vol),
+            mVolumeRect.top + baselineH + mVolumeTopPadding,
+            mTextPaint
+        )
+
+        /**
+         * ----------画时间----------
+         */
+        val columnSpace = mWidth.toFloat() / klineAttribute.gridColumns
+
+        val startX = getXByIndex(mStartIndex) - mPointWidth / 2
+        val stopX = getXByIndex(mStopIndex) + mPointWidth / 2
+
+        for (i in 1 until klineAttribute.gridColumns) {
+            val x = columnSpace * i.toFloat()
+            val translateX = xToTranslateX(x)
+
+            if (translateX in startX..stopX) {
+                val index = indexOfTranslateX(translateX)
+                val item = getItem(index)
+                item?.apply {
+                    canvas.drawText(
+                        this.dateTime,
+                        x - mTextPaint.measureText(this.dateTime) / 2,
+                        mHeight - mBottomPadding + baselineH, mTextPaint
+                    )
+                }
+            }
+
+        }
 
     }
 
