@@ -150,10 +150,11 @@ abstract class ScaleScrollView : RelativeLayout, GestureDetector.OnGestureListen
         velocityY: Float
     ): Boolean {
         if (!inTouch && isScrollEnable) {
+            val velocityS=velocityX / mScrollX
             overScroller.fling(
                 mScrollX,
                 0,
-                (velocityX / mScrollX).roundToInt(),
+                if(velocityS.isNaN()) 0 else velocityS.roundToInt(),
                 0,
                 Int.MIN_VALUE,
                 Int.MAX_VALUE,

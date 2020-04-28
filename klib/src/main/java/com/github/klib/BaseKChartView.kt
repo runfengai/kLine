@@ -636,7 +636,7 @@ abstract class BaseKChartView : ScaleScrollView {
         canvas.drawText(
             vol,
             mWidth - mTextPaint.measureText(vol),
-            mVolumeRect.top + baselineH + mVolumeTopPadding,
+            mVolumeRect.top.toFloat(),
             mTextPaint
         )
 
