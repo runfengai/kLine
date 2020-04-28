@@ -7,7 +7,13 @@ import com.github.klib.entity.KEntity
 import com.github.klib.interfaces.IChartDraw
 import com.github.klib.interfaces.IValueFormatter
 
+/**
+ *预留
+ */
 class BollView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity> {
+    override fun setAttr() {
+
+    }
 
     /**
      * 三个轨道
@@ -24,9 +30,9 @@ class BollView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity>
         canvas: Canvas,
         position: Int
     ) {
-        baseKChartView.drawChildLine(canvas, mUpPaint, lastX, lastPoint.up, currX, currPoint.up)
-        baseKChartView.drawChildLine(canvas, mMbPaint, lastX, lastPoint.mb, currX, currPoint.mb)
-        baseKChartView.drawChildLine(canvas, mDnPaint, lastX, lastPoint.dn, currX, currPoint.dn)
+//        baseKChartView.drawChildLine(canvas, mUpPaint, lastX, lastPoint.up, currX, currPoint.up)
+//        baseKChartView.drawChildLine(canvas, mMbPaint, lastX, lastPoint.mb, currX, currPoint.mb)
+//        baseKChartView.drawChildLine(canvas, mDnPaint, lastX, lastPoint.dn, currX, currPoint.dn)
     }
 
     override fun drawText(

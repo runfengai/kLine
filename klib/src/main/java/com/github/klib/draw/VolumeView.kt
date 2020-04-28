@@ -16,7 +16,8 @@ class VolumeView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntit
     private val volMa5Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val volMa10Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var radius: Float = 0f
-    private fun setAttr() {
+
+    override fun setAttr() {
         baseKchartView.klineAttribute.apply {
             volDownPaint.color = candleDownColor
             volUpPaint.color = candleUpColor

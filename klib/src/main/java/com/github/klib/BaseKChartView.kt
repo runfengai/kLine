@@ -249,7 +249,6 @@ abstract class BaseKChartView : ScaleScrollView {
      * scrollX 转换为 TranslateX
      *
      * @param scrollX 距离
-     * @param needReLocate 初始页面，如果满屏，需要右移一段
      */
     private fun setTranslateXFromScrollX(scrollX: Int) {
         mTranslateX = scrollX + getMinTranslateX()
@@ -288,19 +287,6 @@ abstract class BaseKChartView : ScaleScrollView {
         fun onSelectedChanged(view: BaseKChartView, point: Any, index: Int)
     }
 
-    /**
-     * 各种指标画线
-     */
-    fun drawChildLine(
-        canvas: Canvas,
-        paint: Paint,
-        startX: Float,
-        startValue: Float,
-        stopX: Float,
-        stopValue: Float
-    ) {
-        canvas.drawLine(startX, getChildY(startValue), stopX, getChildY(stopValue), paint)
-    }
 
     /**
      * 根据x,算出y
@@ -377,8 +363,9 @@ abstract class BaseKChartView : ScaleScrollView {
      */
     fun setSubDraw(type: Int) {
         this.type = type
-        if (type != TYPE_NULL_SUB && type < mSubDraws.size) {
-            this.mCurrSubDraw = mSubDraws[type]
+        //索引设置成1开始
+        if (type != TYPE_NULL_SUB && type <= mSubDraws.size) {
+            this.mCurrSubDraw = mSubDraws[type - 1]
         }
     }
 
@@ -622,7 +609,7 @@ abstract class BaseKChartView : ScaleScrollView {
     private fun drawText(canvas: Canvas) {
         val metrics = mTextPaint.fontMetrics
         val textHeight = metrics.descent - metrics.ascent
-        val pdd = metrics.bottom
+//        val pdd = metrics.bottom
         val baselineH = (textHeight - metrics.bottom - metrics.top) / 2
         val mainRow = max(
             if (type == TYPE_NULL_SUB) klineAttribute.gridRows

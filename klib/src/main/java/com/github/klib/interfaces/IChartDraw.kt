@@ -33,4 +33,6 @@ interface IChartDraw<T> {
         return DefValueFormatter()
     }
 
+    fun setAttr()
+
 }

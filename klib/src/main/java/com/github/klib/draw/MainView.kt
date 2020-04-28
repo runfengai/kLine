@@ -17,7 +17,7 @@ import kotlin.math.min
  */
 class MainView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity> {
 
-    private fun setAttr(baseKChartView: BaseKChartView) {
+    override fun setAttr() {
         candleUpPaint.color = baseKChartView.klineAttribute.candleUpColor
         candleDownPaint.color = baseKChartView.klineAttribute.candleDownColor
         selectorTextPaint.color = baseKChartView.klineAttribute.textColor
@@ -293,7 +293,7 @@ class MainView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity>
 
 
     init {
-        setAttr(baseKChartView)
+        setAttr()
     }
 
 
