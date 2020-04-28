@@ -254,7 +254,7 @@ public class DataHelper {
 
             if (i >= 10) {
                 volumeMa10 -= entries.get(i - 10).getVolume();
-                entry.setMa10Volume((volumeMa10 / 5f));
+                entry.setMa10Volume((volumeMa10 / 10f));
             } else {
                 entry.setMa10Volume((volumeMa10 / (i + 1f)));
             }

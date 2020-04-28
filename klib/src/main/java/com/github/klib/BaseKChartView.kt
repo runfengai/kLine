@@ -11,6 +11,9 @@ import android.util.AttributeSet
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.core.content.ContextCompat
+import com.github.klib.KlineConfig.TYPE_NULL_SUB
+import com.github.klib.KlineConfig.TYPE_SUB_MACD
+import com.github.klib.KlineConfig.TYPE_SUB_RSI
 import com.github.klib.entity.DefValueFormatter
 import com.github.klib.entity.KEntity
 import com.github.klib.entity.KlineAttribute
@@ -25,13 +28,6 @@ import kotlin.math.min
 import kotlin.math.round
 
 abstract class BaseKChartView : ScaleScrollView {
-    companion object {
-        //是否有副图
-        const val TYPE_SUB = 0//有
-        const val TYPE_NULL_SUB = -1//无副图
-    }
-
-
     //宽高
     var mWidth = 0
         private set
@@ -93,7 +89,8 @@ abstract class BaseKChartView : ScaleScrollView {
     //主图区域
     private var mMainRect: Rect = Rect()
     //成交量区域
-    private var mVolumeRect: Rect = Rect()
+    var mVolumeRect: Rect = Rect()
+        private set
     //副图区域（根据指标来的，可能没有）
     private var mSubRect: Rect = Rect()
     //副图类型
@@ -228,8 +225,8 @@ abstract class BaseKChartView : ScaleScrollView {
             mSubRect =
                 Rect(0, mVolumeRect.bottom + mSubTopPadding, mWidth, mVolumeRect.bottom + subH)
         } else {
-            mainH = (showHeight * 0.75f).toInt()
-            volumeH = (showHeight * 0.25f).toInt()
+            mainH = (showHeight * 0.8f).toInt()
+            volumeH = (showHeight * 0.2f).toInt()
             mMainRect = Rect(0, mTopPadding + mTopMargin, mWidth, mTopPadding + mTopMargin + mainH)
             mVolumeRect =
                 Rect(0, mMainRect.bottom + mVolumeTopPadding, mWidth, mMainRect.bottom + volumeH)
@@ -273,7 +270,8 @@ abstract class BaseKChartView : ScaleScrollView {
      * return -mDataLen + mWidth / mScaleX - mPointWidth / 2;
      * }
      */
-    private fun getMinTranslateX() = -mDataLen + mWidth / mScaleX + mPointWidth / 2 - mWidth / 5 / mScaleX
+    private fun getMinTranslateX() =
+        -mDataLen + mWidth / mScaleX + mPointWidth / 2 - mWidth / 5 / mScaleX
 
 
     private fun getMaxTranslateX() = if (!isFullScreen()) {
@@ -379,7 +377,7 @@ abstract class BaseKChartView : ScaleScrollView {
      */
     fun setSubDraw(type: Int) {
         this.type = type
-        if (type != TYPE_NULL_SUB) {
+        if (type != TYPE_NULL_SUB && type < mSubDraws.size) {
             this.mCurrSubDraw = mSubDraws[type]
         }
     }
@@ -457,7 +455,7 @@ abstract class BaseKChartView : ScaleScrollView {
                 mMainMaxVal = 1f
             }
         }
-
+        //volume
         if (mVolumeMaxVal == mVolumeMinVal) {
             val pdd = mVolumeMaxVal * 0.05f
             mVolumeMaxVal += pdd
@@ -637,7 +635,12 @@ abstract class BaseKChartView : ScaleScrollView {
          */
         for (i in 0 until mainRow) {
             val text = formatValue(mMainMaxVal - i * betweenItem)
-            canvas.drawText(text, mWidth - textWidth, mMainRect.top - textHeight + i * rowSpace, mTextPaint)
+            canvas.drawText(
+                text,
+                mWidth - textWidth,
+                mMainRect.top - textHeight + i * rowSpace,
+                mTextPaint
+            )
         }
         /**
          * ----------画Volume数值----------
@@ -683,6 +686,14 @@ abstract class BaseKChartView : ScaleScrollView {
      */
     fun getMainY(value: Float): Float {
         return (mMainMaxVal - value) * mMainScaleY + mMainRect.top
+    }
+
+    fun getVolumeY(value: Float): Float {
+        return (mVolumeMaxVal - value) * mVolumeScaleY + mVolumeRect.top
+    }
+
+    fun getSubY(value: Float): Float {
+        return (mSubMaxVal - value) * mSubScaleY + mSubRect.top
     }
 
     fun setGridRows(r: Int) {

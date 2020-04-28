@@ -9,6 +9,11 @@ import kotlin.math.max
 import kotlin.math.min
 
 class MACDView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntity> {
+
+    private fun setAttr() {
+
+    }
+
     override fun drawTranslated(
         lastPoint: KEntity,
         currPoint: KEntity,
@@ -30,6 +35,10 @@ class MACDView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntity>
 
     override fun getMinValue(point: KEntity): Float {
         return min(point.macd, min(point.dea, point.dif))
+    }
+
+    init {
+        setAttr()
     }
 
 }

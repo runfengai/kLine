@@ -39,7 +39,7 @@ data class KlineAttribute(
     var ma5Color: Int = 0,
     var ma10Color: Int = 0,
     var ma30Color: Int = 0,
-    var candleWidth: Float = 0f,//蜡烛宽度？？
+    var candleWidth: Float = 0f,//蜡烛宽度
     var candleLineWidth: Float = 0f,
     var selectorBackgroundColor: Int = 0,
     var selectorTextSize: Float = 0f,

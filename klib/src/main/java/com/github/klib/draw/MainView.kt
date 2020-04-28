@@ -56,9 +56,13 @@ class MainView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity>
     /**
      *
      */
-    fun showMaAndBoll(showMa: Boolean, showBoll: Boolean) {
-        this.showBoll = showBoll
-        this.showMa = showMa
+    fun showMaAndBoll(showMa: Boolean? = null, showBoll: Boolean? = null) {
+        showBoll?.let {
+            this.showBoll = it
+        }
+        showMa?.let {
+            this@MainView.showMa = it
+        }
     }
 
     override fun drawTranslated(
@@ -143,11 +147,10 @@ class MainView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity>
         val lineR = baseKChartView.klineAttribute.candleLineWidth / 2
         when {
             open > close -> {//阴线
-    //            if (baseKchartView.klineAttribute.candleSolid) {
-                //todo 搞
+                //            if (baseKchartView.klineAttribute.candleSolid) {
                 canvas.drawRect(currX - r, close, currX + r, open, candleDownPaint)
                 canvas.drawRect(currX - lineR, high, currX + lineR, low, candleDownPaint)
-    //            }
+                //            }
             }
             open < close -> {//阳
                 canvas.drawRect(currX - r, open, currX + r, close, candleUpPaint)

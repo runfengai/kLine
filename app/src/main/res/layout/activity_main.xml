@@ -1,19 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <com.github.klib.KChartView
-        android:id="@+id/kChartView"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="500dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".MainActivity">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="40dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="主图："
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/mainMa"
+                android:layout_width="60dp"
+                android:layout_height="38dp"
+                android:layout_gravity="center_vertical"
+                android:background="@android:color/darker_gray"
+                android:button="@null"
+                android:checked="true"
+                android:gravity="center"
+                android:text="MA"
+                android:textColor="@color/sel_checked"
+                tools:checked="true" />
+
+            <CheckBox
+                android:id="@+id/mainBoll"
+                android:layout_width="60dp"
+                android:layout_height="38dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="10dp"
+                android:background="@android:color/darker_gray"
+                android:button="@null"
+                android:gravity="center"
+                android:text="BOLL"
+                android:textColor="@color/sel_checked"
+                tools:checked="true" />
+
+        </LinearLayout>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="5dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="副图："
+                    android:textSize="16sp" />
+
+                <RadioGroup
+                    android:id="@+id/subRadioGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/subMACD"
+                        android:layout_width="60dp"
+                        android:layout_height="38dp"
+                        android:layout_gravity="center_vertical"
+                        android:background="@android:color/darker_gray"
+                        android:button="@null"
+                        android:checked="false"
+                        android:gravity="center"
+                        android:text="MACD"
+                        android:textColor="@color/sel_checked"
+                        tools:checked="false" />
+
+                    <RadioButton
+                        android:id="@+id/subKDJ"
+                        android:layout_width="60dp"
+                        android:layout_height="38dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="10dp"
+                        android:background="@android:color/darker_gray"
+                        android:button="@null"
+                        android:gravity="center"
+                        android:text="KDJ"
+                        android:textColor="@color/sel_checked"
+                        tools:checked="true" />
+
+                    <RadioButton
+                        android:id="@+id/subRSI"
+                        android:layout_width="60dp"
+                        android:layout_height="38dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="10dp"
+                        android:background="@android:color/darker_gray"
+                        android:button="@null"
+                        android:gravity="center"
+                        android:text="RSI"
+                        android:textColor="@color/sel_checked"
+                        tools:checked="true" />
+
+                    <RadioButton
+                        android:id="@+id/subWR"
+                        android:layout_width="60dp"
+                        android:layout_height="38dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="10dp"
+                        android:background="@android:color/darker_gray"
+                        android:button="@null"
+                        android:gravity="center"
+                        android:text="WR"
+                        android:textColor="@color/sel_checked"
+                        tools:checked="true" />
+
+                    <RadioButton
+                        android:id="@+id/subClear"
+                        android:layout_width="60dp"
+                        android:layout_height="38dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="10dp"
+                        android:background="@android:color/darker_gray"
+                        android:button="@null"
+                        android:checked="true"
+                        android:gravity="center"
+                        android:text="清空"
+                        android:textColor="@color/sel_checked"
+                        tools:checked="true" />
+                </RadioGroup>
+
+            </LinearLayout>
+
+
+        </HorizontalScrollView>
+
+        <com.github.klib.KChartView
+            android:id="@+id/kChartView"
+            android:layout_width="match_parent"
+            android:layout_height="500dp" />
+    </LinearLayout>
+</ScrollView>
