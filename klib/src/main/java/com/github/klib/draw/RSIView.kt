@@ -61,11 +61,19 @@ class RSIView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntity> 
             baseKchartView.getSubY(currPoint.rsi3),
             rsi3Paint
         )
-
     }
 
     override fun drawText(canvas: Canvas, position: Int, x: Float, y: Float) {
-
+        val item = baseKchartView.getItem(position) ?: return
+        var x0 = x
+        var text = "RSI(1):${getValueFormatter().format(item.rsi1)}   "
+        canvas.drawText(text, x0, y, rsi1Paint)
+        x0 += rsi1Paint.measureText(text)
+        text = "RSI(2):${getValueFormatter().format(item.rsi2)}   "
+        canvas.drawText(text, x0, y, rsi2Paint)
+        x0 += rsi2Paint.measureText(text)
+        text = "RSI(3):${getValueFormatter().format(item.rsi3)}"
+        canvas.drawText(text, x0, y, rsi3Paint)
     }
 
     override fun getMaxValue(point: KEntity): Float {

@@ -82,7 +82,16 @@ class MACDView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntity>
     }
 
     override fun drawText(canvas: Canvas, position: Int, x: Float, y: Float) {
-
+        val item = baseKchartView.getItem(position) ?: return
+        var text = "MACD:${getValueFormatter().format(item.macd)}   "
+        var x0 = x
+        canvas.drawText(text, x0, y, macdPaint)
+        x0 += macdPaint.measureText(text)
+        text = "DIF:${getValueFormatter().format(item.dif)}   "
+        canvas.drawText(text, x0, y, difPaint)
+        x0 += difPaint.measureText(text)
+        text = "DEA:${getValueFormatter().format(item.dea)}"
+        canvas.drawText(text, x0, y, deaPaint)
     }
 
     override fun getMaxValue(point: KEntity): Float {

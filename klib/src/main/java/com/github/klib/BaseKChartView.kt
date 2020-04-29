@@ -162,10 +162,12 @@ abstract class BaseKChartView : ScaleScrollView {
     fun init() {
 //        super.initDetector()
         val defPadding = getDimension(R.dimen.kline_padding).toInt()
-        mLeftPadding = defPadding
-        mTopPadding = mLeftPadding
+        mLeftPadding = getDimension(R.dimen.kline_text_start_padding).toInt()
+        mTopPadding = defPadding
         mBottomPadding = defPadding
-        mVolumeTopPadding = defPadding
+        val metrics = mTextPaint.fontMetrics
+        mVolumeTopPadding = (metrics.descent - metrics.ascent).toInt()
+
         mSubTopPadding = defPadding
 //        mAnimator = ValueAnimator.ofFloat(0f, 1f)
 
@@ -409,7 +411,7 @@ abstract class BaseKChartView : ScaleScrollView {
                 canvas,
                 position,
                 mLeftPadding.toFloat(),
-                mVolumeRect.top.toFloat()
+                mVolumeRect.top.toFloat() + mVolumeTopPadding
             )
             if (type != TYPE_NULL_SUB) {
                 mCurrSubView?.apply {

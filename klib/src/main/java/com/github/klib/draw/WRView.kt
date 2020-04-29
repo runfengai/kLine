@@ -13,6 +13,7 @@ class WRView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity> {
         baseKChartView.klineAttribute.apply {
             paint.strokeWidth = lineWidth
             paint.color = wrColor
+            paint.textSize = textSize
         }
     }
 
@@ -34,7 +35,11 @@ class WRView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity> {
         )
     }
 
-    override fun drawText(canvas: Canvas, position: Int, x: Float, y: Float) {}
+    override fun drawText(canvas: Canvas, position: Int, x: Float, y: Float) {
+        val item = baseKChartView.getItem(position) ?: return
+        val text = "WR(14):${getValueFormatter().format(item.wr)}"
+        canvas.drawText(text, x, y, paint)
+    }
 
     override fun getMaxValue(point: KEntity): Float {
         return point.wr

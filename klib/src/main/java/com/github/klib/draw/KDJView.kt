@@ -63,7 +63,16 @@ class KDJView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntity> 
     }
 
     override fun drawText(canvas: Canvas, position: Int, x: Float, y: Float) {
-
+        val item = baseKchartView.getItem(position) ?: return
+        var text = "K:${getValueFormatter().format(item.k)}   "
+        var x0 = x
+        canvas.drawText(text, x0, y, kPaint)
+        x0 += kPaint.measureText(text)
+        text = "D:${getValueFormatter().format(item.d)}   "
+        canvas.drawText(text, x0, y, dPaint)
+        x0 += dPaint.measureText(text)
+        text = "J:${getValueFormatter().format(item.j)}"
+        canvas.drawText(text, x0, y, jPaint)
     }
 
     override fun getMaxValue(point: KEntity): Float {
