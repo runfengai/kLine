@@ -12,8 +12,6 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.core.content.ContextCompat
 import com.github.klib.KlineConfig.TYPE_NULL_SUB
-import com.github.klib.KlineConfig.TYPE_SUB_MACD
-import com.github.klib.KlineConfig.TYPE_SUB_RSI
 import com.github.klib.entity.DefValueFormatter
 import com.github.klib.entity.KEntity
 import com.github.klib.entity.KlineAttribute
@@ -41,6 +39,9 @@ abstract class BaseKChartView : ScaleScrollView {
         private set
     private var mVolumeTopPadding = 0
     private var mSubTopPadding = 0
+
+    private var mLeftPadding = 0
+
     //子图最大
     private var mMainScaleY: Float = 1f
 
@@ -102,11 +103,11 @@ abstract class BaseKChartView : ScaleScrollView {
     /**
      * 副图各种指标
      */
-    private val mSubDraws = mutableListOf<IChartDraw<KEntity>>()
+    private val mSubViews = mutableListOf<IChartDraw<KEntity>>()
     /**
      *当前副图指标类型
      */
-    private var mCurrSubDraw: IChartDraw<KEntity>? = null
+    private var mCurrSubView: IChartDraw<KEntity>? = null
 
 
     //float格式化
@@ -129,7 +130,8 @@ abstract class BaseKChartView : ScaleScrollView {
     /**
      * grid线的行间距
      */
-    private var rowSpace: Float = 0f
+    var rowSpace: Float = 0f
+        private set
 
     val klineAttribute = KlineAttribute()
 
@@ -160,7 +162,8 @@ abstract class BaseKChartView : ScaleScrollView {
     fun init() {
 //        super.initDetector()
         val defPadding = getDimension(R.dimen.kline_padding).toInt()
-        mTopPadding = defPadding
+        mLeftPadding = defPadding
+        mTopPadding = mLeftPadding
         mBottomPadding = defPadding
         mVolumeTopPadding = defPadding
         mSubTopPadding = defPadding
@@ -330,7 +333,7 @@ abstract class BaseKChartView : ScaleScrollView {
     }
 
     fun addSubDraw(item: IChartDraw<KEntity>) {
-        mSubDraws.add(item)
+        mSubViews.add(item)
     }
 
     /**
@@ -364,8 +367,8 @@ abstract class BaseKChartView : ScaleScrollView {
     fun setSubDraw(type: Int) {
         this.type = type
         //索引设置成1开始
-        if (type != TYPE_NULL_SUB && type <= mSubDraws.size) {
-            this.mCurrSubDraw = mSubDraws[type - 1]
+        if (type != TYPE_NULL_SUB && type <= mSubViews.size) {
+            this.mCurrSubView = mSubViews[type - 1]
         }
     }
 
@@ -393,7 +396,28 @@ abstract class BaseKChartView : ScaleScrollView {
         canvas.restore()
     }
 
-    private fun drawValue(canvas: Canvas, i: Int) {
+    /**
+     * 三个图的各指标
+     */
+    private fun drawValue(canvas: Canvas, position: Int) {
+//        val metrics = mTextPaint.fontMetrics
+//        val textH = metrics.descent - metrics.ascent
+//        val baselineH = (textH - metrics.bottom - metrics.top) / 2
+        if (position in 0..mItemCount) {
+            mMainView.drawText(canvas, position, mLeftPadding.toFloat(), mTopPadding.toFloat())
+            mVolumeView.drawText(
+                canvas,
+                position,
+                mLeftPadding.toFloat(),
+                mVolumeRect.top.toFloat()
+            )
+            if (type != TYPE_NULL_SUB) {
+                mCurrSubView?.apply {
+                    drawText(canvas, position, mLeftPadding.toFloat(), mSubRect.top.toFloat())
+                }
+            }
+        }
+
 
     }
 
@@ -423,7 +447,7 @@ abstract class BaseKChartView : ScaleScrollView {
 
                 mVolumeMaxVal = max(mVolumeMaxVal, mVolumeView.getMaxValue(this))
                 mVolumeMinVal = min(mVolumeMinVal, mVolumeView.getMinValue(this))
-                mCurrSubDraw?.let {
+                mCurrSubView?.let {
                     mSubMaxVal = max(mSubMaxVal, it.getMaxValue(this))
                     mSubMinVal = min(mSubMinVal, it.getMinValue(this))
                 }
@@ -451,7 +475,7 @@ abstract class BaseKChartView : ScaleScrollView {
         }
 
         if (type != TYPE_NULL_SUB) {//副图
-            mCurrSubDraw?.let {
+            mCurrSubView?.let {
                 if (mSubMaxVal == mSubMinVal) {
                     val pdd = mSubMaxVal * 0.05f
                     mSubMaxVal += pdd
@@ -547,7 +571,7 @@ abstract class BaseKChartView : ScaleScrollView {
                 i
             )
             if (type != TYPE_NULL_SUB) {
-                mCurrSubDraw?.drawTranslated(
+                mCurrSubView?.drawTranslated(
                     lastPoint,
                     currentPoint,
                     lastPointX,

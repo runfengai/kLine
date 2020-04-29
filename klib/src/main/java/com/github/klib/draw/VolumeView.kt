@@ -15,6 +15,7 @@ class VolumeView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntit
     private val volUpPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val volMa5Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val volMa10Paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val volTextPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var radius: Float = 0f
 
     override fun setAttr() {
@@ -23,8 +24,13 @@ class VolumeView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntit
             volUpPaint.color = candleUpColor
             volMa5Paint.color = ma5Color
             volMa10Paint.color = ma10Color
+            volTextPaint.color = textColor
+
             volDownPaint.strokeWidth = candleWidth
             volUpPaint.strokeWidth = candleWidth
+
+            volTextPaint.textSize = textSize
+
             radius = candleWidth / 2
         }
     }
@@ -72,7 +78,19 @@ class VolumeView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntit
     }
 
     override fun drawText(canvas: Canvas, position: Int, x: Float, y: Float) {
-
+        val item = baseKchartView.getItem(position) ?: return
+        var x0 = x
+        var text = "VOL:${getValueFormatter().format(item.volume)}"
+        volTextPaint.color = baseKchartView.klineAttribute.textColor
+        canvas.drawText(text, x0, y, volTextPaint)
+        x0 += volTextPaint.measureText("$text   ")
+        text = "MA5:${getValueFormatter().format(item.ma5Volume)}"
+        volTextPaint.color = baseKchartView.klineAttribute.ma5Color
+        canvas.drawText(text, x0, y, volTextPaint)
+        x0 += volTextPaint.measureText("$text   ")
+        text = "MA10:${getValueFormatter().format(item.ma10Volume)}"
+        volTextPaint.color = baseKchartView.klineAttribute.ma10Color
+        canvas.drawText(text, x0, y, volTextPaint)
     }
 
     override fun getMaxValue(point: KEntity): Float {

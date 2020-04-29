@@ -18,22 +18,29 @@ import kotlin.math.min
 class MainView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity> {
 
     override fun setAttr() {
-        candleUpPaint.color = baseKChartView.klineAttribute.candleUpColor
-        candleDownPaint.color = baseKChartView.klineAttribute.candleDownColor
-        selectorTextPaint.color = baseKChartView.klineAttribute.textColor
-        selectorFramePaint.color = baseKChartView.klineAttribute.textColor
-        selectorFramePaint.style = Paint.Style.STROKE
+        baseKChartView.klineAttribute.apply {
+            candleUpPaint.color = candleUpColor
+            candleDownPaint.color = candleDownColor
+            selectorTextPaint.color = textColor
+            selectorFramePaint.color = textColor
+            selectorFramePaint.style = Paint.Style.STROKE
 
-        ma5Paint.color = baseKChartView.klineAttribute.ma5Color
-        ma10Paint.color = baseKChartView.klineAttribute.ma10Color
-        ma30Paint.color = baseKChartView.klineAttribute.ma30Color
-        selectorTextPaint.color = baseKChartView.klineAttribute.textColor
-        selectorTextPaint.textSize = baseKChartView.klineAttribute.textSize
-        selectorBackgroundPaint.color = baseKChartView.klineAttribute.selectorBackgroundColor
+            ma5Paint.color = ma5Color
+            ma10Paint.color = ma10Color
+            ma30Paint.color = ma30Color
+            selectorTextPaint.color = textColor
+            selectorTextPaint.textSize = textSize
+            selectorBackgroundPaint.color = selectorBackgroundColor
 
-        ma5Paint.strokeWidth = baseKChartView.klineAttribute.lineWidth
-        ma10Paint.strokeWidth = baseKChartView.klineAttribute.lineWidth
-        ma30Paint.strokeWidth = baseKChartView.klineAttribute.lineWidth
+            ma5Paint.strokeWidth = lineWidth
+            ma10Paint.strokeWidth = lineWidth
+            ma30Paint.strokeWidth = lineWidth
+
+            ma5Paint.textSize = textSize
+            ma10Paint.textSize = textSize
+            ma30Paint.textSize = textSize
+        }
+
     }
 
     //跌时蜡烛颜色（默认红）
@@ -51,8 +58,8 @@ class MainView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity>
     /**
      * 是否显示ma/ boll
      */
-    var showMa = true//默认显示ma
-    var showBoll = false
+    private var showMa = true//默认显示ma
+    private var showBoll = false
     /**
      *
      */
@@ -147,7 +154,7 @@ class MainView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity>
         val lineR = baseKChartView.klineAttribute.candleLineWidth / 2
         when {
             open > close -> {//阴线
-                //            if (baseKchartView.klineAttribute.candleSolid) {
+                //            if (candleSolid) {
                 canvas.drawRect(currX - r, close, currX + r, open, candleDownPaint)
                 canvas.drawRect(currX - lineR, high, currX + lineR, low, candleDownPaint)
                 //            }
@@ -171,19 +178,19 @@ class MainView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity>
         if (showMa) {
             var text = "MA5:${baseKChartView.formatValue(item.MA5)} "
             canvas.drawText(text, x0, y, ma5Paint)
-            x0 += ma5Paint.measureText(text)
+            x0 += ma5Paint.measureText("$text   ")
             text = "MA10:${baseKChartView.formatValue(item.MA10)} "
             canvas.drawText(text, x0, y, ma10Paint)
-            x0 += ma10Paint.measureText(text)
+            x0 += ma10Paint.measureText("$text   ")
             text = "MA30:${baseKChartView.formatValue(item.MA30)}"
             canvas.drawText(text, x0, y, ma30Paint)
         } else if (showBoll) {
             var text = "BOLL:${baseKChartView.formatValue(item.mb)} "
             canvas.drawText(text, x0, y, ma10Paint)
-            x0 += ma10Paint.measureText(text)
+            x0 += ma5Paint.measureText("$text   ")
             text = "UB:${baseKChartView.formatValue(item.up)} "
             canvas.drawText(text, x0, y, ma5Paint)
-            x0 += ma5Paint.measureText(text)
+            x0 += ma10Paint.measureText("$text   ")
             text = "LB:${baseKChartView.formatValue(item.dn)}"
             canvas.drawText(text, x0, y, ma30Paint)
         }

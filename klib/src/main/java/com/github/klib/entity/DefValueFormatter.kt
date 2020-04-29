@@ -5,7 +5,7 @@ import com.github.klib.interfaces.IValueFormatter
 class DefValueFormatter : IValueFormatter {
     private var scale: Int
 
-    constructor(scale: Int = 8) {
+    constructor(scale: Int = 2) {
         this.scale = scale
     }
 
