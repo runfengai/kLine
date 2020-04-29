@@ -17,15 +17,14 @@ class KChartView : BaseKChartView {
     private var defM5Color: Int = 0
     private var defM10Color: Int = 0
     private var defM30Color: Int = 0
-
     /**
-     * 绘图
+     * 绘副图
      */
-    private lateinit var mBollView: BollView
-    private lateinit var mKdjView: KDJView
     private lateinit var mMacdView: MACDView
-
+    private lateinit var mKdjView: KDJView
     private lateinit var mRsiView: RSIView
+    private lateinit var mWrView: WRView
+
     private lateinit var mVolumeView: VolumeView
     /**
      * 允许滑动、缩放
@@ -69,11 +68,11 @@ class KChartView : BaseKChartView {
         lp.addRule(CENTER_IN_PARENT)
         addView(mProgressbar, lp)
 
-        mBollView = BollView(this)
         mKdjView = KDJView(this)
         mMacdView = MACDView(this)
         mMainView = MainView(this)
         mRsiView = RSIView(this)
+        mWrView = WRView(this)
         mVolumeView = VolumeView(this)
 
         addVolumeDraw(mVolumeView)
@@ -81,8 +80,8 @@ class KChartView : BaseKChartView {
         addSubDraw(mMacdView)
         addSubDraw(mKdjView)
         addSubDraw(mRsiView)
-
-
+        addSubDraw(mWrView)
+        
     }
 
     /**
@@ -203,6 +202,10 @@ class KChartView : BaseKChartView {
         klineAttribute.upColor = typedArray.getColor(R.styleable.KChartView_upColor, defM5Color)
         klineAttribute.mbColor = typedArray.getColor(R.styleable.KChartView_mbColor, defM10Color)
         klineAttribute.dnColor = typedArray.getColor(R.styleable.KChartView_dnColor, defM30Color)
+        /**
+         * wr
+         */
+        klineAttribute.wrColor = typedArray.getColor(R.styleable.KChartView_dnColor, defM10Color)
 
         typedArray.recycle()
         updateKlineAttr()

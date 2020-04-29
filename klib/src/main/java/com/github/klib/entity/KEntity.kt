@@ -50,6 +50,8 @@ open class KEntity(
 
     var rsi1: Float = 0f,
     var rsi2: Float = 0f,
-    var rsi3: Float = 0f//rsi指标
+    var rsi3: Float = 0f,//rsi指标
+
+    var wr:Float=0f//
 
 )

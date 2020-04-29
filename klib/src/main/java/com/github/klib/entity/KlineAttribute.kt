@@ -35,6 +35,8 @@ data class KlineAttribute(
     var upColor: Int = 0,
     var mbColor: Int = 0,
     var dnColor: Int = 0,
+    //wr
+    var wrColor: Int = 0,
     //main
     var ma5Color: Int = 0,
     var ma10Color: Int = 0,

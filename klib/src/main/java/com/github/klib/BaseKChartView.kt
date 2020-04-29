@@ -458,7 +458,7 @@ abstract class BaseKChartView : ScaleScrollView {
                     mSubMinVal -= pdd
                     if (mSubMaxVal == 0f) mSubMaxVal = 1f
                 }
-                mVolumeScaleY = mSubRect.height() * 1f / (mSubMaxVal - mSubMinVal)
+                mSubScaleY = mSubRect.height() * 1f / (mSubMaxVal - mSubMinVal)
             }
         }
         mMainScaleY = mMainRect.height() * 1f / (mMainMaxVal - mMainMinVal)
