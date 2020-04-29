@@ -9,6 +9,7 @@ import android.graphics.Paint.ANTI_ALIAS_FLAG
 import android.graphics.Rect
 import android.util.AttributeSet
 import android.util.Log
+import android.view.MotionEvent
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.core.content.ContextCompat
@@ -76,6 +77,8 @@ abstract class BaseKChartView : ScaleScrollView {
     private var mItemCount: Int = 0
 
     private var mDataLen = 0f
+
+    private var selectedIndex = 0
     //动画
     private var mAnimator: ValueAnimator? = null
     private val animationDuration = 500L
@@ -258,6 +261,16 @@ abstract class BaseKChartView : ScaleScrollView {
                 )
         }
 
+    }
+
+    override fun onLongPress(e: MotionEvent?) {
+        super.onLongPress(e)
+        if (e == null) return
+        //
+        selectedIndex = indexOfTranslateX(xToTranslateX(e.x))
+        if (selectedIndex < mStartIndex) selectedIndex = mStartIndex
+        if (selectedIndex > mStopIndex) selectedIndex = mStopIndex
+        invalidate()
     }
 
     override fun onScrollChanged(l: Int, t: Int, oldl: Int, oldt: Int) {
