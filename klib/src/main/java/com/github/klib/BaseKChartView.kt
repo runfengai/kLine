@@ -8,7 +8,6 @@ import android.graphics.Paint
 import android.graphics.Paint.ANTI_ALIAS_FLAG
 import android.graphics.Rect
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
@@ -77,8 +76,6 @@ abstract class BaseKChartView : ScaleScrollView {
     private var mItemCount: Int = 0
 
     private var mDataLen = 0f
-
-    private var selectedIndex = 0
     //动画
     private var mAnimator: ValueAnimator? = null
     private val animationDuration = 500L
@@ -267,9 +264,9 @@ abstract class BaseKChartView : ScaleScrollView {
         super.onLongPress(e)
         if (e == null) return
         //
-        selectedIndex = indexOfTranslateX(xToTranslateX(e.x))
-        if (selectedIndex < mStartIndex) selectedIndex = mStartIndex
-        if (selectedIndex > mStopIndex) selectedIndex = mStopIndex
+        this.mSelectedIndex = indexOfTranslateX(xToTranslateX(e.x))
+        if (this.mSelectedIndex < mStartIndex) this.mSelectedIndex = mStartIndex
+        if (this.mSelectedIndex > mStopIndex) this.mSelectedIndex = mStopIndex
         invalidate()
     }
 
@@ -428,7 +425,7 @@ abstract class BaseKChartView : ScaleScrollView {
         drawGrid(canvas)
         drawK(canvas)
         drawText(canvas)
-        drawValue(canvas, if (isLongPress) mSelectedIndex else mStopIndex)
+        drawValue(canvas, if (isLongPress) this.mSelectedIndex else mStopIndex)
         canvas.restore()
     }
 
@@ -462,7 +459,7 @@ abstract class BaseKChartView : ScaleScrollView {
      */
     private fun calculateValue() {
         if (!isLongPress) {
-            mSelectedIndex = -1
+            this.mSelectedIndex = -1
         }
         //找到索引
         mStartIndex = indexOfTranslateX(xToTranslateX(0f))
@@ -619,8 +616,9 @@ abstract class BaseKChartView : ScaleScrollView {
         }
         //长按
         if (isLongPress) {
-            val point = getItem(mSelectedIndex) ?: return
-            val x = getXByIndex(mSelectedIndex)
+            if (mSelectedIndex < 0) return
+            val point = getItem(this.mSelectedIndex) ?: return
+            val x = getXByIndex(this.mSelectedIndex)
             val y = getMainY(point.close)
             canvas.drawLine(
                 x,
