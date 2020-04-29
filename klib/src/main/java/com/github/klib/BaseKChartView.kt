@@ -8,6 +8,7 @@ import android.graphics.Paint
 import android.graphics.Paint.ANTI_ALIAS_FLAG
 import android.graphics.Rect
 import android.util.AttributeSet
+import android.util.Log
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.core.content.ContextCompat
@@ -37,10 +38,11 @@ abstract class BaseKChartView : ScaleScrollView {
     var mTopMargin = 60
     var mBottomPadding = 0
         private set
+    //左侧各指标text显示区域高度
     private var mVolumeTopPadding = 0
-    private var mSubTopPadding = 0
 
     private var mLeftPadding = 0
+    private var mEndPadding = 0
 
     //子图最大
     private var mMainScaleY: Float = 1f
@@ -160,15 +162,14 @@ abstract class BaseKChartView : ScaleScrollView {
     }
 
     fun init() {
+        mTextPaint.textSize = klineAttribute.textSize
 //        super.initDetector()
         val defPadding = getDimension(R.dimen.kline_padding).toInt()
         mLeftPadding = getDimension(R.dimen.kline_text_start_padding).toInt()
+        mEndPadding = getDimension(R.dimen.kline_text_end_padding).toInt()
         mTopPadding = defPadding
         mBottomPadding = defPadding
-        val metrics = mTextPaint.fontMetrics
-        mVolumeTopPadding = (metrics.descent - metrics.ascent).toInt()
 
-        mSubTopPadding = defPadding
 //        mAnimator = ValueAnimator.ofFloat(0f, 1f)
 
         selectorCircleRadius = DensityUtil.dip2px(context, 2f).toFloat()
@@ -208,6 +209,11 @@ abstract class BaseKChartView : ScaleScrollView {
         notifyChanged()
     }
 
+    private fun getTextHeight(): Int {
+        val metrics = mTextPaint.fontMetrics
+        return (metrics.descent - metrics.ascent).toInt()
+    }
+
     /**
      * 限定三块的区域所占高度的比例，以及尺寸：
      * （1）有副图
@@ -218,6 +224,11 @@ abstract class BaseKChartView : ScaleScrollView {
     private fun initRect(w: Int, h: Int) {
         mWidth = w
         mHeight = h
+
+        if (mVolumeTopPadding == 0) {//通过paint算出来的
+            mVolumeTopPadding = getTextHeight()
+        }
+        val metricsBottom = mTextPaint.fontMetrics.bottom.toInt()
         val showHeight = h - mTopPadding - mBottomPadding - mTopMargin
         //默认有副图
         var mainH = (showHeight * 0.6f).toInt()
@@ -226,15 +237,25 @@ abstract class BaseKChartView : ScaleScrollView {
         if (type != TYPE_NULL_SUB) {//有副图
             mMainRect = Rect(0, mTopPadding + mTopMargin, mWidth, mTopPadding + mTopMargin + mainH)
             mVolumeRect =
-                Rect(0, mMainRect.bottom + mVolumeTopPadding, mWidth, mMainRect.bottom + volumeH)
+                Rect(
+                    0,
+                    mMainRect.bottom + mVolumeTopPadding + metricsBottom,
+                    mWidth,
+                    mMainRect.bottom + volumeH
+                )
             mSubRect =
-                Rect(0, mVolumeRect.bottom + mSubTopPadding, mWidth, mVolumeRect.bottom + subH)
+                Rect(0, mVolumeRect.bottom + mVolumeTopPadding + metricsBottom, mWidth, mVolumeRect.bottom + subH)
         } else {
             mainH = (showHeight * 0.8f).toInt()
             volumeH = (showHeight * 0.2f).toInt()
             mMainRect = Rect(0, mTopPadding + mTopMargin, mWidth, mTopPadding + mTopMargin + mainH)
             mVolumeRect =
-                Rect(0, mMainRect.bottom + mVolumeTopPadding, mWidth, mMainRect.bottom + volumeH)
+                Rect(
+                    0,
+                    mMainRect.bottom + mVolumeTopPadding + metricsBottom,
+                    mWidth,
+                    mMainRect.bottom + volumeH
+                )
         }
 
     }
@@ -411,7 +432,7 @@ abstract class BaseKChartView : ScaleScrollView {
                 canvas,
                 position,
                 mLeftPadding.toFloat(),
-                mVolumeRect.top.toFloat() + mVolumeTopPadding
+                mMainRect.bottom.toFloat() + mVolumeTopPadding
             )
             if (type != TYPE_NULL_SUB) {
                 mCurrSubView?.apply {
@@ -601,7 +622,7 @@ abstract class BaseKChartView : ScaleScrollView {
             if (type != TYPE_NULL_SUB) {
                 canvas.drawLine(
                     x,
-                    (mSubRect.top - mSubTopPadding).toFloat(),
+                    (mSubRect.top - mVolumeTopPadding).toFloat(),
                     x,
                     mSubRect.bottom.toFloat(),
                     mSelectedLinePaint
@@ -650,8 +671,8 @@ abstract class BaseKChartView : ScaleScrollView {
             val text = formatValue(mMainMaxVal - i * betweenItem)
             canvas.drawText(
                 text,
-                mWidth - textWidth,
-                mMainRect.top - textHeight + i * rowSpace,
+                mWidth - textWidth - mEndPadding,
+                mMainRect.top - metrics.bottom + i * rowSpace,
                 mTextPaint
             )
         }
@@ -661,8 +682,8 @@ abstract class BaseKChartView : ScaleScrollView {
         val vol = mVolumeView.getValueFormatter().format(mVolumeMaxVal)
         canvas.drawText(
             vol,
-            mWidth - mTextPaint.measureText(vol),
-            mVolumeRect.top.toFloat(),
+            mWidth - mTextPaint.measureText(vol) - mEndPadding,
+            mMainRect.bottom.toFloat() + textHeight,
             mTextPaint
         )
 

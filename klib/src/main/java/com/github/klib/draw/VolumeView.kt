@@ -2,6 +2,7 @@ package com.github.klib.draw
 
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.util.Log
 import com.github.klib.BaseKChartView
 import com.github.klib.entity.BigValueFormatter
 import com.github.klib.entity.KEntity
