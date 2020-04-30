@@ -2,6 +2,7 @@ package com.github.kline
 
 import android.util.SparseArray
 import com.github.klib.entity.KEntity
+import com.github.kline.utils.DateUtils
 
 
 import org.json.JSONArray
@@ -72,7 +73,7 @@ class DataParse : Serializable {
             val pattern = getPatternByType(tag)
 
             val dateMill = data.optLong(0)
-            val dateStr = WonderfulDateUtils.getFormatTime(pattern, Date(dateMill))
+            val dateStr = DateUtils.getFormatTime(pattern, Date(dateMill))
 
             val sdf = SimpleDateFormat(pattern, Locale.SIMPLIFIED_CHINESE)
             if (!firstGotTag) {
@@ -129,14 +130,14 @@ class DataParse : Serializable {
                 }
 //                val week = (currDate.time - lastDate.time) / (24 * 60 * 60 * 1000)
 //                addNoMerge = week >= 7
-                addNoMerge = !WonderfulDateUtils.isSameWeek(currDate, lastDate)
+                addNoMerge = !DateUtils.isSameWeek(currDate, lastDate)
             } else if (tag == GlobalConstant.TAG_MONTH) {
                 if (!firstGotTag) {
                     firstGotTag = true
                 }
 //                val mon = (currDate.time - lastDate.time) / (24 * 60 * 60 * 1000)
 //                addNoMerge = mon >= 30
-                addNoMerge = !WonderfulDateUtils.isSameMonth(currDate, lastDate)
+                addNoMerge = !DateUtils.isSameMonth(currDate, lastDate)
             }
 
             val mapSavedList = kLineMap[lastDateStr]
@@ -169,7 +170,7 @@ class DataParse : Serializable {
 
     //获取修正后的日期
     private fun getModifiedDate(pattern: String, dateStr: String, tag: Int): String {
-        val time = WonderfulDateUtils.getTimeMillis(pattern, dateStr)
+        val time = DateUtils.getTimeMillis(pattern, dateStr)
 
         val reminder = when (tag) {
             GlobalConstant.TAG_FIVE_MINUTE -> time % (5 * 60 * 1000)
@@ -181,7 +182,7 @@ class DataParse : Serializable {
         }
         return if (reminder != 0L) {
             val res = time - reminder
-            WonderfulDateUtils.getFormatTime(pattern, Date(res))
+            DateUtils.getFormatTime(pattern, Date(res))
         } else {
             dateStr
         }

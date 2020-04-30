@@ -196,13 +196,73 @@ class MainView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity>
         }
 
         if (baseKChartView.isLongPress) {
-            drawSelector(canvas)
+            drawSelector1(canvas)
         }
     }
 
     /**
      *绘制高亮部分
      */
+    private fun drawSelector1(canvas: Canvas) {
+        val metrics = selectorTextPaint.fontMetrics
+        val textH = metrics.descent - metrics.ascent
+        val baseline = (textH - metrics.bottom - metrics.top) / 2
+        val index = baseKChartView.mSelectedIndex
+        val item = baseKChartView.getItem(index) ?: return
+        val padding = DensityUtil.dip2px(baseKChartView.context, 5f)
+        //外框对外边距
+        val margin = padding
+        val xOfIndex = baseKChartView.translateXtoX(baseKChartView.getXByIndex(index))
+
+        val width = max(
+            selectorTextPaint.measureText("${getString(R.string.kline_time)}  ${item.dateTime}"),
+            selectorTextPaint.measureText("${getString(R.string.kline_open)}  ${item.open}")
+        ) + padding * 2
+        //边框左坐标
+        val left = if (xOfIndex > baseKChartView.mWidth / 2) {//需要显示在左边
+            margin.toFloat()
+        } else {//需要显示在右边
+            baseKChartView.mWidth - margin - width
+        }
+        val top = (margin + baseKChartView.mTopPadding).toFloat()
+        val height = padding * 8 + textH * 8
+        val rect = RectF(left, top, left + width, top + height)
+        canvas.drawRoundRect(rect, 6f, 6f, selectorBackgroundPaint)
+        canvas.drawRoundRect(rect, 6f, 6f, selectorFramePaint)
+
+        val list = mutableListOf<Array<Any>>()//第一个放标识,第二个放值
+        list.add(arrayOf(getString(R.string.kline_time), item.dateTime))
+        list.add(arrayOf(getString(R.string.kline_open), item.open))
+        list.add(arrayOf(getString(R.string.kline_high), item.highest))
+        list.add(arrayOf(getString(R.string.kline_low), item.lowest))
+        list.add(arrayOf(getString(R.string.kline_close), item.close))
+        list.add(arrayOf(getString(R.string.kline_change), item.change))
+        list.add(arrayOf(getString(R.string.kline_change_p), item.changePercent))
+        list.add(arrayOf(getString(R.string.kline_amount), item.volume))
+
+        var x = left + padding
+        var y = top + padding + baseline
+        for (i in 0 until list.size) {
+            val arrItem = list[i]
+            selectorTextPaint.color = baseKChartView.klineAttribute.textColor
+            canvas.drawText("${arrItem[0]}", x, y, selectorTextPaint)
+            if (i == 5 || i == 6) {//颜色变了。。。。
+                val value = arrItem[1] as Float
+                selectorTextPaint.color =
+                    if (value > 0f) baseKChartView.klineAttribute.candleUpColor else baseKChartView.klineAttribute.candleDownColor
+            }
+            canvas.drawText(
+                "${arrItem[1]}",
+                left + width - padding - selectorTextPaint.measureText("${arrItem[1]}"),
+                y,
+                selectorTextPaint
+            )
+            y += textH + padding
+        }
+
+
+    }
+
     private fun drawSelector(canvas: Canvas) {
         val metrics = selectorTextPaint.fontMetrics
         val textHeight = metrics.descent - metrics.ascent
@@ -215,11 +275,11 @@ class MainView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity>
         val top = margin + baseKChartView.mTopPadding
         val height = padding * 8 + textHeight * 8
         val item = baseKChartView.getItem(index) ?: return
-        val adapter = baseKChartView.getAdapter() ?: return
+        val date = item.dateTime
 
         val list = mutableListOf<Array<Any>>()//第一个放标识,第二个放值
         val textWidths = mutableListOf<Float>()
-        list.add(arrayOf(getString(R.string.kline_time), adapter.getDate(index)))
+        list.add(arrayOf(getString(R.string.kline_time), date))
         list.add(arrayOf(getString(R.string.kline_open), item.open))
         list.add(arrayOf(getString(R.string.kline_high), item.highest))
         list.add(arrayOf(getString(R.string.kline_low), item.lowest))
@@ -258,16 +318,16 @@ class MainView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity>
                 var redX = x + padding
                 val redY = y
                 val textLeft = "${it[0]}$sb"
-                canvas.drawText(textLeft, redX, redY, selectorFramePaint)
+                canvas.drawText(textLeft, redX, redY, selectorTextPaint)
                 redX += selectorFramePaint.measureText(textLeft)
                 val value = it[1] as Float
-                selectorFramePaint.color =
+                selectorTextPaint.color =
                     if (value > 0f) baseKChartView.klineAttribute.candleUpColor else baseKChartView.klineAttribute.candleDownColor
-                canvas.drawText("${it[1]}", redX, redY, selectorFramePaint)
+                canvas.drawText("${it[1]}", redX, redY, selectorTextPaint)
             } else {
-                selectorFramePaint.color = baseKChartView.klineAttribute.textColor
+                selectorTextPaint.color = baseKChartView.klineAttribute.textColor
                 val text = "${it[0]}${sb}${it[1]}"
-                canvas.drawText(text, x + padding, y, selectorFramePaint)
+                canvas.drawText(text, x + padding, y, selectorTextPaint)
                 y += textHeight + padding
             }
         }

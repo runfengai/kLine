@@ -1,4 +1,4 @@
-package com.github.kline
+package com.github.kline.utils
 
 import com.github.kline.DataParse.Companion.DATE_FORMAT_0
 
@@ -15,7 +15,7 @@ import kotlin.math.abs
  * Created by Administrator on 2017/9/1.
  */
 
-object WonderfulDateUtils {
+object DateUtils {
 
     private val dateLocal = ThreadLocal<SimpleDateFormat>()
 

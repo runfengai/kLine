@@ -433,9 +433,6 @@ abstract class BaseKChartView : ScaleScrollView {
      * 三个图的各指标
      */
     private fun drawValue(canvas: Canvas, position: Int) {
-//        val metrics = mTextPaint.fontMetrics
-//        val textH = metrics.descent - metrics.ascent
-//        val baselineH = (textH - metrics.bottom - metrics.top) / 2
         if (position in 0..mItemCount) {
             mMainView.drawText(canvas, position, mLeftPadding.toFloat(), mTopPadding.toFloat())
             mVolumeView.drawText(
