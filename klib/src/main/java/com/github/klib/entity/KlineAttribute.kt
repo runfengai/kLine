@@ -12,7 +12,7 @@ data class KlineAttribute(
     var textColor: Int = 0,
     var lineWidth: Float = 0f,//细线
     var backgroundColor: Int = 0,
-    var selectedLineColor: Int = 0,
+    var selectedLineColor: Int = 0,//选中某列，高亮线颜色
     var selectedLineWidth: Float = 0f,
     var gridLineWidth: Float = 0f,
     var gridLineColor: Int = 0,

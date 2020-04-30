@@ -118,7 +118,7 @@ class KChartView : BaseKChartView {
         klineAttribute.selectedLineColor =
             typedArray.getColor(
                 R.styleable.KChartView_selectedLineColor,
-                getColor(R.color.kline_text_color)
+                getColor(R.color.kline_selector_line_row_color)
             )
         klineAttribute.selectedLineWidth = typedArray.getDimension(
             R.styleable.KChartView_selectedLineWidth,

@@ -218,7 +218,7 @@ object DataHelper {
                 point.MA30 = ma30 / (i + 1f)
             }
             point.change = point.close - point.open
-            val p = point.change / point.open
+            val p = point.change / point.open * 100
             point.changePercent = String.format(Locale.getDefault(), "%.2f", p) + "%"
         }
     }

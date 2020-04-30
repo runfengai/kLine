@@ -3,10 +3,8 @@ package com.github.klib
 import android.animation.ValueAnimator
 import android.content.Context
 import android.database.DataSetObserver
-import android.graphics.Canvas
-import android.graphics.Paint
+import android.graphics.*
 import android.graphics.Paint.ANTI_ALIAS_FLAG
-import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.MotionEvent
 import androidx.annotation.ColorRes
@@ -20,7 +18,6 @@ import com.github.klib.interfaces.BaseKChartAdapter
 import com.github.klib.interfaces.IAdapter
 import com.github.klib.interfaces.IChartDraw
 import com.github.klib.interfaces.IValueFormatter
-import com.github.klib.util.DensityUtil
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -62,10 +59,14 @@ abstract class BaseKChartView : ScaleScrollView {
     private val mTextPaint = Paint(ANTI_ALIAS_FLAG)
     //背景
     private val mBackgroundPaint = Paint(ANTI_ALIAS_FLAG)
-    //选中的k线高亮
-    private val mSelectedLinePaint = Paint(ANTI_ALIAS_FLAG)
-    //选中的k线高亮
+    /**
+     * 选中的k线高亮
+     */
+    private val mSelectedRowLinePaint = Paint(ANTI_ALIAS_FLAG)
+    private val mSelectedColumnLinePaint = Paint(ANTI_ALIAS_FLAG)//列渐变效果
     private val mSelectedCirclePaint = Paint(ANTI_ALIAS_FLAG)
+    private var mSelectedCircle0Color = 0
+    private var mSelectedCircle1Color = 0
 
     var mSelectedIndex: Int = 0
         private set
@@ -127,7 +128,6 @@ abstract class BaseKChartView : ScaleScrollView {
     private var mSubMaxVal = Float.MAX_VALUE
     private var mSubMinVal = Float.MIN_VALUE
 
-    private var selectorCircleRadius = 1f
 
     /**
      * grid线的行间距
@@ -172,9 +172,10 @@ abstract class BaseKChartView : ScaleScrollView {
 
 //        mAnimator = ValueAnimator.ofFloat(0f, 1f)
 
-        selectorCircleRadius = DensityUtil.dip2px(context, 2f).toFloat()
-
         mTopMargin = getDimension(R.dimen.kline_top_margin).toInt()
+
+        mSelectedCircle0Color = getColor(R.color.kline_selector_circle_0_color)
+        mSelectedCircle1Color = getColor(R.color.kline_selector_circle_1_color)
     }
 
     /**
@@ -244,7 +245,12 @@ abstract class BaseKChartView : ScaleScrollView {
                     mMainRect.bottom + volumeH
                 )
             mSubRect =
-                Rect(0, mVolumeRect.bottom + mVolumeTopPadding + metricsBottom, mWidth, mVolumeRect.bottom + subH)
+                Rect(
+                    0,
+                    mVolumeRect.bottom + mVolumeTopPadding + metricsBottom,
+                    mWidth,
+                    mVolumeRect.bottom + subH
+                )
         } else {
             mainH = (showHeight * 0.8f).toInt()
             volumeH = (showHeight * 0.2f).toInt()
@@ -617,23 +623,54 @@ abstract class BaseKChartView : ScaleScrollView {
             val point = getItem(this.mSelectedIndex) ?: return
             val x = getXByIndex(this.mSelectedIndex)
             val y = getMainY(point.close)
+//            canvas.drawLine(
+//                x,
+//                mMainRect.top.toFloat(),
+//                x,
+//                mVolumeRect.bottom.toFloat(),
+//                mSelectedRowLinePaint
+//            )
+            val gradient = LinearGradient(
+                x,
+                mTopPadding.toFloat(),
+                x,
+                (mHeight - mBottomPadding).toFloat(),
+//                intArrayOf(startColor, endColor),
+                intArrayOf(
+                    getColor(R.color.kline_selector_line_column_color_half),
+                    getColor(R.color.kline_selector_line_column_color),
+                    getColor(R.color.kline_selector_line_column_color_half)
+                ),
+                null, Shader.TileMode.MIRROR
+            )
+            mSelectedColumnLinePaint.shader = gradient
+            //渐变竖线
             canvas.drawLine(
                 x,
-                mMainRect.top.toFloat(),
+                mTopPadding.toFloat(),
                 x,
-                mVolumeRect.bottom.toFloat(),
-                mSelectedLinePaint
+                (mHeight - mBottomPadding).toFloat(), mSelectedColumnLinePaint
             )
-            canvas.drawLine(-mTranslateX, y, -mTranslateX + mWidth / mScaleX, y, mSelectedLinePaint)
-            //todo 此处画两个圆
-            canvas.drawCircle(x, y, selectorCircleRadius, mSelectedCirclePaint)
+            //横线
+            canvas.drawLine(
+                -mTranslateX,
+                y,
+                -mTranslateX + mWidth / mScaleX,
+                y,
+                mSelectedRowLinePaint
+            )
+            //
+            mSelectedCirclePaint.color = mSelectedCircle0Color
+            canvas.drawCircle(x, y, klineAttribute.candleWidth / 2, mSelectedCirclePaint)
+            mSelectedCirclePaint.color = mSelectedCircle1Color
+            canvas.drawCircle(x, y, klineAttribute.candleWidth * 3 / 2, mSelectedCirclePaint)
             if (type != TYPE_NULL_SUB) {
                 canvas.drawLine(
                     x,
                     (mSubRect.top - mVolumeTopPadding).toFloat(),
                     x,
                     mSubRect.bottom.toFloat(),
-                    mSelectedLinePaint
+                    mSelectedRowLinePaint
                 )
             }
 
@@ -754,15 +791,17 @@ abstract class BaseKChartView : ScaleScrollView {
      * 更新属性
      */
     fun updateKlineAttr() {
-        mSelectedLinePaint.color = klineAttribute.selectedLineColor
-        mSelectedLinePaint.strokeWidth = klineAttribute.selectedLineWidth
+        mSelectedRowLinePaint.color = klineAttribute.selectedLineColor
+        mSelectedRowLinePaint.strokeWidth = klineAttribute.selectedLineWidth
+        mSelectedColumnLinePaint.strokeWidth = klineAttribute.candleWidth
+
         mTextPaint.color = klineAttribute.textColor
         mTextPaint.textSize = klineAttribute.textSize
         mBackgroundPaint.color = klineAttribute.backgroundColor
         mPointWidth = klineAttribute.pointWidth
         mGridPaint.color = klineAttribute.gridLineColor
         mGridPaint.strokeWidth = klineAttribute.gridLineWidth
-        mSelectedCirclePaint.color = klineAttribute.textColor
+
     }
 
 
