@@ -7,7 +7,7 @@
     <color name="kline_ma5">#18CCF6</color>
     <color name="kline_ma10">#FE5EDF</color>
     <color name="kline_ma30">#E7A520</color>
-    <color name="kline_selector">#c830343C</color>
+    <color name="kline_selector_background">#cc0A1C30</color>
     <color name="kline_candle_up_color">#02AF7B</color>
     <color name="kline_candle_down_color">#f15057</color>
 </resources>

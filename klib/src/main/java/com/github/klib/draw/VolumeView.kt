@@ -65,9 +65,9 @@ class VolumeView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntit
     //绘制量
     private fun drawVol(currPoint: KEntity, currX: Float, canvas: Canvas) {
         val paint = if (currPoint.close >= currPoint.open) {
-            volDownPaint
-        } else {
             volUpPaint
+        } else {
+            volDownPaint
         }
         canvas.drawRect(
             currX - radius,

@@ -17,7 +17,7 @@ open class KEntity(
      * 蜡烛线
      */
     var change: Float = 0f,//涨跌额
-    var changePercent: Float = 0f,//涨跌幅
+    var changePercent: String = "",//涨跌幅
     var open: Float = 0f,//开盘价
     var highest: Float = 0f,//最高价
     var lowest: Float = 0f,//最低价

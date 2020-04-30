@@ -81,7 +81,7 @@ class KChartView : BaseKChartView {
         addSubDraw(mKdjView)
         addSubDraw(mRsiView)
         addSubDraw(mWrView)
-        
+
     }
 
     /**
@@ -160,7 +160,7 @@ class KChartView : BaseKChartView {
         klineAttribute.selectorBackgroundColor =
             typedArray.getColor(
                 R.styleable.KChartView_selectorBackgroundColor,
-                getColor(R.color.kline_selector)
+                getColor(R.color.kline_selector_background)
             )
         klineAttribute.selectorTextSize = typedArray.getDimension(
             R.styleable.KChartView_selectorTextSize,

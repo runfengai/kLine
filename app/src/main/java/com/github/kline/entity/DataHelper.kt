@@ -2,10 +2,12 @@ package com.github.kline.entity
 
 
 import com.github.klib.entity.KEntity
+import java.util.*
 
-import java.util.ArrayList
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.sqrt
 
 /**
  * 数据辅助类 计算macd rsi等
@@ -23,9 +25,9 @@ object DataHelper {
     /**
      * 计算RSI
      *
-     * @param datas
+     * @param list
      */
-    internal fun calculateRSI(datas: List<KEntity>) {
+    private fun calculateRSI(list: List<KEntity>) {
         var rsi1: Float
         var rsi2: Float
         var rsi3: Float
@@ -35,8 +37,8 @@ object DataHelper {
         var rsi1MaxEma = 0f
         var rsi2MaxEma = 0f
         var rsi3MaxEma = 0f
-        for (i in datas.indices) {
-            val point = datas[i]
+        for (i in list.indices) {
+            val point = list[i]
             val closePrice = point.close
             if (i == 0) {
                 rsi1 = 0f
@@ -49,16 +51,16 @@ object DataHelper {
                 rsi2MaxEma = 0f
                 rsi3MaxEma = 0f
             } else {
-                val Rmax = Math.max(0f, closePrice - datas[i - 1].close)
-                val RAbs = Math.abs(closePrice - datas[i - 1].close)
-                rsi1MaxEma = (Rmax + (6f - 1) * rsi1MaxEma) / 6f
-                rsi1ABSEma = (RAbs + (6f - 1) * rsi1ABSEma) / 6f
+                val rMax = max(0f, closePrice - list[i - 1].close)
+                val rAbs = abs(closePrice - list[i - 1].close)
+                rsi1MaxEma = (rMax + (6f - 1) * rsi1MaxEma) / 6f
+                rsi1ABSEma = (rAbs + (6f - 1) * rsi1ABSEma) / 6f
 
-                rsi2MaxEma = (Rmax + (12f - 1) * rsi2MaxEma) / 12f
-                rsi2ABSEma = (RAbs + (12f - 1) * rsi2ABSEma) / 12f
+                rsi2MaxEma = (rMax + (12f - 1) * rsi2MaxEma) / 12f
+                rsi2ABSEma = (rAbs + (12f - 1) * rsi2ABSEma) / 12f
 
-                rsi3MaxEma = (Rmax + (24f - 1) * rsi3MaxEma) / 24f
-                rsi3ABSEma = (RAbs + (24f - 1) * rsi3ABSEma) / 24f
+                rsi3MaxEma = (rMax + (24f - 1) * rsi3MaxEma) / 24f
+                rsi3ABSEma = (rAbs + (24f - 1) * rsi3ABSEma) / 24f
 
                 rsi1 = rsi1MaxEma / rsi1ABSEma * 100
                 rsi2 = rsi2MaxEma / rsi2ABSEma * 100
@@ -73,14 +75,14 @@ object DataHelper {
     /**
      * 计算kdj
      *
-     * @param datas
+     * @param list
      */
-    internal fun calculateKDJ(datas: List<KEntity>) {
+    private fun calculateKDJ(list: List<KEntity>) {
         var k = 0f
         var d = 0f
 
-        for (i in datas.indices) {
-            val point = datas[i]
+        for (i in list.indices) {
+            val point = list[i]
             val closePrice = point.close
             var startIndex = i - 8
             if (startIndex < 0) {
@@ -89,8 +91,8 @@ object DataHelper {
             var max9 = java.lang.Float.MIN_VALUE
             var min9 = java.lang.Float.MAX_VALUE
             for (index in startIndex..i) {
-                max9 = Math.max(max9, datas[index].highest)
-                min9 = Math.min(min9, datas[index].lowest)
+                max9 = max(max9, list[index].highest)
+                min9 = min(min9, list[index].lowest)
 
             }
             val rsv = 100f * (closePrice - min9) / (max9 - min9)
@@ -111,17 +113,17 @@ object DataHelper {
     /**
      * 计算macd
      *
-     * @param datas
+     * @param list
      */
-    private fun calculateMACD(datas: List<KEntity>) {
+    private fun calculateMACD(list: List<KEntity>) {
         var ema12 = 0f
         var ema26 = 0f
         var dif: Float
         var dea = 0f
         var macd: Float
 
-        for (i in datas.indices) {
-            val point = datas[i]
+        for (i in list.indices) {
+            val point = list[i]
             val closePrice = point.close
             if (i == 0) {
                 ema12 = closePrice
@@ -148,11 +150,11 @@ object DataHelper {
     /**
      * 计算 BOLL 需要在计算ma之后进行
      *
-     * @param datas
+     * @param list
      */
-    private fun calculateBOLL(datas: List<KEntity>) {
-        for (i in datas.indices) {
-            val point = datas[i]
+    private fun calculateBOLL(list: List<KEntity>) {
+        for (i in list.indices) {
+            val point = list[i]
             val closePrice = point.close
             if (i == 0) {
                 point.mb = closePrice
@@ -165,13 +167,13 @@ object DataHelper {
                 }
                 var md = 0f
                 for (j in i - n + 1..i) {
-                    val c = datas[j].close
+                    val c = list[j].close
                     val m = point.MA30
                     val value = c - m
                     md += value * value
                 }
-                md = md / (n - 1)
-                md = Math.sqrt(md.toDouble()).toFloat()
+                md /= (n - 1)
+                md = sqrt(md.toDouble()).toFloat()
                 point.mb = point.MA30
                 point.up = point.mb + 2f * md
                 point.dn = point.mb - 2f * md
@@ -183,38 +185,41 @@ object DataHelper {
     /**
      * 计算ma
      *
-     * @param datas
+     * @param list
      */
-    private fun calculateMA(datas: List<KEntity>) {
+    private fun calculateMA(list: List<KEntity>) {
         var ma5 = 0f
         var ma10 = 0f
         var ma30 = 0f
 
-        for (i in datas.indices) {
-            val point = datas[i]
+        for (i in list.indices) {
+            val point = list[i]
             val closePrice = point.close
 
             ma5 += closePrice
             ma10 += closePrice
             ma30 += closePrice
             if (i >= 5) {
-                ma5 -= datas[i - 5].close
+                ma5 -= list[i - 5].close
                 point.MA5 = ma5 / 5f
             } else {
                 point.MA5 = ma5 / (i + 1f)
             }
             if (i >= 10) {
-                ma10 -= datas[i - 10].close
+                ma10 -= list[i - 10].close
                 point.MA10 = ma10 / 10f
             } else {
                 point.MA10 = ma10 / (i + 1f)
             }
             if (i >= 30) {
-                ma30 -= datas[i - 30].close
+                ma30 -= list[i - 30].close
                 point.MA30 = ma30 / 30f
             } else {
                 point.MA30 = ma30 / (i + 1f)
             }
+            point.change = point.close - point.open
+            val p = point.change / point.open
+            point.changePercent = String.format(Locale.getDefault(), "%.2f", p) + "%"
         }
     }
 
