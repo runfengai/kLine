@@ -228,7 +228,7 @@ class MainView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity>
             baseKChartView.mWidth - margin - width
         }
         val top = (margin + baseKChartView.mTopPadding).toFloat()
-        val height = padding * 8 + textH * 8
+        val height = padding * 9 + textH * 8
         val rect = RectF(left, top, left + width, top + height)
         canvas.drawRoundRect(rect, 6f, 6f, selectorBackgroundPaint)
         canvas.drawRoundRect(rect, 6f, 6f, selectorFramePaint)
@@ -253,16 +253,24 @@ class MainView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity>
                 val value = list[5][1] as Float//获取change
                 selectorTextPaint.color =
                     if (value >= 0f) baseKChartView.klineAttribute.candleUpColor else baseKChartView.klineAttribute.candleDownColor
+                val textVal =
+                    if (arrItem[1] is Float) baseKChartView.formatValue(arrItem[1] as Float) else arrItem[1]
+                val textWithSymbol = "${if (value >= 0f) "+" else ""}$textVal"
                 canvas.drawText(
-                    "${if (value >= 0f) "+" else "-"}${arrItem[1]}",
-                    left + width - padding - selectorTextPaint.measureText("${arrItem[1]}"),
+                    textWithSymbol,
+                    left + width - padding - selectorTextPaint.measureText(textWithSymbol),
                     y,
                     selectorTextPaint
                 )
             } else {
+                val textVal = if (arrItem[1] is Float) {
+                    baseKChartView.formatValue(arrItem[1] as Float)
+                } else {
+                    "${arrItem[1]}"
+                }
                 canvas.drawText(
-                    "${arrItem[1]}",
-                    left + width - padding - selectorTextPaint.measureText("${arrItem[1]}"),
+                    textVal,
+                    left + width - padding - selectorTextPaint.measureText(textVal),
                     y,
                     selectorTextPaint
                 )

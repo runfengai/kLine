@@ -7,6 +7,7 @@ import android.widget.RadioButton
 import androidx.appcompat.app.AppCompatActivity
 import com.github.klib.KChartView
 import com.github.klib.KlineConfig
+import com.github.klib.entity.DefValueFormatter
 import com.github.klib.entity.KEntity
 import com.github.kline.GlobalConstant.TAG_AN_HOUR
 import com.google.gson.Gson
@@ -48,6 +49,9 @@ class MainActivity : AppCompatActivity() {
 
         listeners()
         fetchData()
+
+        //设置精度
+        kChartView?.setValueFormatter(DefValueFormatter(4))
     }
 
 

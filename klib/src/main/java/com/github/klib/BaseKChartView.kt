@@ -1,6 +1,5 @@
 package com.github.klib
 
-import android.animation.ValueAnimator
 import android.content.Context
 import android.database.DataSetObserver
 import android.graphics.*
@@ -32,9 +31,8 @@ abstract class BaseKChartView : ScaleScrollView {
     //各种padding
     var mTopPadding = 0
         private set
-    var mTopMargin = 60
-    var mBottomPadding = 0
-        private set
+    private var mTopMargin = 60
+    private var mBottomPadding = 0
     //左侧各指标text显示区域高度
     private var mVolumeTopPadding = 0
 
@@ -47,10 +45,6 @@ abstract class BaseKChartView : ScaleScrollView {
     private var mVolumeScaleY = 1f
 
     private var mSubScaleY = 1f
-    //mb等值
-    private var mChildMaxValue = Int.MAX_VALUE
-    private var mChildMinValue = Int.MIN_VALUE
-
     //点的宽度
     private var mPointWidth = 10f
     //网格线
@@ -77,17 +71,8 @@ abstract class BaseKChartView : ScaleScrollView {
     private var mItemCount: Int = 0
 
     private var mDataLen = 0f
-    //动画
-    private var mAnimator: ValueAnimator? = null
-    private val animationDuration = 500L
-    //???支持超屏拖动
+    //???
     private var mOverScrollRange = 0f
-
-    private var onSelectedChangeListener: OnSelectedChangeListener? = null
-    /**
-     * 绘图相关
-     */
-    private var mChildDraw: IChartDraw<KEntity>? = null
     //用于绘制的
     protected lateinit var mMainView: IChartDraw<KEntity>
     //主图区域
@@ -100,7 +85,7 @@ abstract class BaseKChartView : ScaleScrollView {
     //副图类型
     private var type: Int = TYPE_NULL_SUB
     /**
-     * volume图，内部可能包含kdj啥的
+     * volume图 含ma5Volume,ma10Volume
      */
     private lateinit var mVolumeView: IChartDraw<KEntity>
     /**
@@ -114,7 +99,7 @@ abstract class BaseKChartView : ScaleScrollView {
 
 
     //float格式化
-    val mValueFormatter: IValueFormatter = DefValueFormatter()
+    var mValueFormatter: IValueFormatter = DefValueFormatter()
     /**
      * 计算当前屏幕的开始、结束索引
      */
@@ -322,19 +307,10 @@ abstract class BaseKChartView : ScaleScrollView {
     }
 
     /**
-     * 长按选中监听
+     * 设置value精度
      */
-
-    interface OnSelectedChangeListener {
-        fun onSelectedChanged(view: BaseKChartView, point: Any, index: Int)
-    }
-
-
-    /**
-     * 根据x,算出y
-     */
-    fun getChildY(value: Float): Float {
-        return (mChildMaxValue - value) * mVolumeScaleY + mVolumeRect.top
+    fun setValueFormatter(valueFormatter: IValueFormatter) {
+        this.mValueFormatter = valueFormatter
     }
 
     /**
@@ -623,13 +599,6 @@ abstract class BaseKChartView : ScaleScrollView {
             val point = getItem(this.mSelectedIndex) ?: return
             val x = getXByIndex(this.mSelectedIndex)
             val y = getMainY(point.close)
-//            canvas.drawLine(
-//                x,
-//                mMainRect.top.toFloat(),
-//                x,
-//                mVolumeRect.bottom.toFloat(),
-//                mSelectedRowLinePaint
-//            )
             val gradient = LinearGradient(
                 x,
                 mTopPadding.toFloat(),
