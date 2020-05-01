@@ -45,5 +45,10 @@ data class KlineAttribute(
     var candleLineWidth: Float = 0f,
     var selectorBackgroundColor: Int = 0,
     var selectorTextSize: Float = 0f,
-    var candleSolid: Boolean = true//蜡烛是否实心,目前仅实心
+    var candleSolid: Boolean = true,//蜡烛是否实心,目前仅实心
+    //分时线
+    var timeLineWidth: Float = 0f, //分时线颜色
+    var timeLineColor: Int = 0, //分时线颜色
+    var timeLineShaderColorTop: Int = 0, //分时线颜色
+    var timeLineShaderColorBtm: Int = 0 //分时线颜色
 )

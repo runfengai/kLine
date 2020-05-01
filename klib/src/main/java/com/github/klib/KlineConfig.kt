@@ -10,4 +10,7 @@ object KlineConfig {
     const val TYPE_SUB_KDJ = 2
     const val TYPE_SUB_RSI = 3
     const val TYPE_SUB_WR = 4
+    //主图类型
+    const val TYPE_MAIN_CANDLE = 1
+    const val TYPE_MAIN_TIME_LINE = 2
 }

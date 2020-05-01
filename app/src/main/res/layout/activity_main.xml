@@ -52,6 +52,19 @@
                 android:textColor="@color/sel_checked"
                 tools:checked="true" />
 
+            <CheckBox
+                android:id="@+id/mainIsTimeLine"
+                android:layout_width="60dp"
+                android:layout_height="38dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="10dp"
+                android:background="@android:color/darker_gray"
+                android:button="@null"
+                android:gravity="center"
+                android:text="分时图"
+                android:textColor="@color/sel_checked"
+                tools:checked="true" />
+
         </LinearLayout>
 
         <HorizontalScrollView

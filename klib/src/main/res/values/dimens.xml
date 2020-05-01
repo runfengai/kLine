@@ -12,4 +12,5 @@
     <dimen name="kline_text_start_padding">10dp</dimen>
     <dimen name="kline_text_end_padding">2dp</dimen>
     <dimen name="kline_top_margin">30dp</dimen>
+    <dimen name="kline_time_line_width">2dp</dimen>
 </resources>

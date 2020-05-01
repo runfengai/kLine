@@ -21,7 +21,7 @@ class MainView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity>
         baseKChartView.klineAttribute.apply {
             candleUpPaint.color = candleUpColor
             candleDownPaint.color = candleDownColor
-            selectorTextPaint.color = textColor
+
             selectorFramePaint.color = textColor
             selectorFramePaint.style = Paint.Style.STROKE
 

@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity() {
     private var adapter = KAdapter()
     private lateinit var mainMa: CheckBox
     private lateinit var mainBoll: CheckBox
+    private lateinit var mainIsTimeLine: CheckBox
 
     private lateinit var subMACD: RadioButton
     private lateinit var subKDJ: RadioButton
@@ -41,6 +42,7 @@ class MainActivity : AppCompatActivity() {
         kChartView = findViewById(R.id.kChartView)
         mainMa = findViewById(R.id.mainMa)
         mainBoll = findViewById(R.id.mainBoll)
+        mainIsTimeLine = findViewById(R.id.mainIsTimeLine)
 
         subMACD = findViewById(R.id.subMACD)
         subKDJ = findViewById(R.id.subKDJ)
@@ -69,6 +71,16 @@ class MainActivity : AppCompatActivity() {
                 mainMa.isChecked = false
             }
         }
+
+        mainIsTimeLine.setOnCheckedChangeListener { _, isChecked ->
+            kChartView?.setMainType(
+                if (!isChecked) {
+                    KlineConfig.TYPE_MAIN_CANDLE
+                } else
+                    KlineConfig.TYPE_MAIN_TIME_LINE
+            )
+        }
+
 
         subRadioGroup.setOnCheckedChangeListener { _, checkedId ->
             val type = when (checkedId) {

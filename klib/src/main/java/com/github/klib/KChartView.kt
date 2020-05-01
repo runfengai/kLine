@@ -68,12 +68,17 @@ class KChartView : BaseKChartView {
         lp.addRule(CENTER_IN_PARENT)
         addView(mProgressbar, lp)
 
+        mMainCandleView = MainView(this)
+        mMainView = mMainCandleView//默认
+        mMainTimeLineView = TimeLineView(this)
+
+        mVolumeView = VolumeView(this)
+
         mKdjView = KDJView(this)
         mMacdView = MACDView(this)
-        mMainView = MainView(this)
         mRsiView = RSIView(this)
         mWrView = WRView(this)
-        mVolumeView = VolumeView(this)
+
 
         addVolumeDraw(mVolumeView)
 
@@ -206,7 +211,25 @@ class KChartView : BaseKChartView {
          * wr
          */
         klineAttribute.wrColor = typedArray.getColor(R.styleable.KChartView_dnColor, defM10Color)
-
+        /**
+         * 分时线
+         */
+        klineAttribute.timeLineWidth = typedArray.getDimension(
+            R.styleable.KChartView_timeLineWidth,
+            getDimension(R.dimen.kline_time_line_width)
+        )
+        klineAttribute.timeLineColor = typedArray.getColor(
+            R.styleable.KChartView_timeLineColor,
+            getColor(R.color.kline_time_line_color)
+        )
+        klineAttribute.timeLineShaderColorTop = typedArray.getColor(
+            R.styleable.KChartView_timeLineShaderColorTop,
+            getColor(R.color.kline_time_line_shader_color_top)
+        )
+        klineAttribute.timeLineColor = typedArray.getColor(
+            R.styleable.KChartView_timeLineShaderColorBtm,
+            getColor(R.color.kline_time_line_shader_color_btm)
+        )
         typedArray.recycle()
         updateKlineAttr()
     }
@@ -257,7 +280,7 @@ class KChartView : BaseKChartView {
      * ref  BaseKChartView.TYPE_NULL_SUB
      */
     fun setChildType(childType: Int) {
-        setSubDraw(childType)
+        setSubView(childType)
         //与上次类型一致
         if (childType * mLastType > 0) {
             notifyChanged()
@@ -271,13 +294,28 @@ class KChartView : BaseKChartView {
      * 主图是否显示ma和boll线
      */
     fun showMaAndBoll(showMa: Boolean? = null, showBoll: Boolean? = null) {
-        (mMainView as MainView).showMaAndBoll(showMa, showBoll)
+        if (mMainView is MainView) {
+            (mMainView as MainView).showMaAndBoll(showMa, showBoll)
+        }
         getAdapter()?.let {
             if (it.getCount() > 0) {
                 notifyChanged()
             }
         }
 
+    }
+
+    /**
+     * 设置主图类型：默认蜡烛图，可选分时图
+     * ref {@link KlineConfig}
+     */
+    fun setMainType(mainType: Int) {
+        setMainView(mainType)
+        getAdapter()?.let {
+            if (it.getCount() > 0) {
+                notifyChanged()
+            }
+        }
     }
 
 

@@ -9,6 +9,8 @@ import android.view.MotionEvent
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.core.content.ContextCompat
+import com.github.klib.KlineConfig.TYPE_MAIN_CANDLE
+import com.github.klib.KlineConfig.TYPE_MAIN_TIME_LINE
 import com.github.klib.KlineConfig.TYPE_NULL_SUB
 import com.github.klib.entity.DefValueFormatter
 import com.github.klib.entity.KEntity
@@ -75,15 +77,19 @@ abstract class BaseKChartView : ScaleScrollView {
     private var mOverScrollRange = 0f
     //用于绘制的
     protected lateinit var mMainView: IChartDraw<KEntity>
+    protected lateinit var mMainCandleView: IChartDraw<KEntity>
+    protected lateinit var mMainTimeLineView: IChartDraw<KEntity>
     //主图区域
-    private var mMainRect: Rect = Rect()
+    var mMainRect: Rect = Rect()
+        private set
     //成交量区域
     var mVolumeRect: Rect = Rect()
         private set
     //副图区域（根据指标来的，可能没有）
     private var mSubRect: Rect = Rect()
     //副图类型
-    private var type: Int = TYPE_NULL_SUB
+    private var subType: Int = TYPE_NULL_SUB
+    private var mainType: Int = TYPE_MAIN_CANDLE
     /**
      * volume图 含ma5Volume,ma10Volume
      */
@@ -103,8 +109,10 @@ abstract class BaseKChartView : ScaleScrollView {
     /**
      * 计算当前屏幕的开始、结束索引
      */
-    private var mStartIndex = 0
-    private var mStopIndex = 0
+    var mStartIndex = 0
+        private set
+    var mStopIndex = 0
+        private set
 
     private var mMainMaxVal = Float.MAX_VALUE
     private var mMainMinVal = Float.MIN_VALUE
@@ -220,7 +228,7 @@ abstract class BaseKChartView : ScaleScrollView {
         var mainH = (showHeight * 0.6f).toInt()
         var volumeH = (showHeight * 0.2f).toInt()
         val subH = (showHeight * 0.2f).toInt()
-        if (type != TYPE_NULL_SUB) {//有副图
+        if (subType != TYPE_NULL_SUB) {//有副图
             mMainRect = Rect(0, mTopPadding + mTopMargin, mWidth, mTopPadding + mTopMargin + mainH)
             mVolumeRect =
                 Rect(
@@ -379,12 +387,25 @@ abstract class BaseKChartView : ScaleScrollView {
     /**
      * 设置副图绘制的类型
      */
-    fun setSubDraw(type: Int) {
-        this.type = type
+    fun setSubView(type: Int) {
+        this.subType = type
         //索引设置成1开始
         if (type != TYPE_NULL_SUB && type <= mSubViews.size) {
             this.mCurrSubView = mSubViews[type - 1]
         }
+    }
+
+    fun setMainView(mainType: Int) {
+        this.mainType = mainType
+        this.mMainView = when (mainType) {
+            TYPE_MAIN_TIME_LINE -> {
+                mMainTimeLineView
+            }
+            else -> {
+                mMainCandleView
+            }
+        }
+
     }
 
     /**
@@ -423,7 +444,7 @@ abstract class BaseKChartView : ScaleScrollView {
                 mLeftPadding.toFloat(),
                 mMainRect.bottom.toFloat() + mVolumeTopPadding
             )
-            if (type != TYPE_NULL_SUB) {
+            if (subType != TYPE_NULL_SUB) {
                 mCurrSubView?.apply {
                     drawText(canvas, position, mLeftPadding.toFloat(), mSubRect.top.toFloat())
                 }
@@ -486,7 +507,7 @@ abstract class BaseKChartView : ScaleScrollView {
             if (mVolumeMaxVal == 0f) mVolumeMaxVal = 1f
         }
 
-        if (type != TYPE_NULL_SUB) {//副图
+        if (subType != TYPE_NULL_SUB) {//副图
             mCurrSubView?.let {
                 if (mSubMaxVal == mSubMinVal) {
                     val pdd = mSubMaxVal * 0.05f
@@ -582,7 +603,7 @@ abstract class BaseKChartView : ScaleScrollView {
                 canvas,
                 i
             )
-            if (type != TYPE_NULL_SUB) {
+            if (subType != TYPE_NULL_SUB) {
                 mCurrSubView?.drawTranslated(
                     lastPoint,
                     currentPoint,
@@ -647,7 +668,7 @@ abstract class BaseKChartView : ScaleScrollView {
                 y + r2,
                 mSelectedCirclePaint
             )
-            if (type != TYPE_NULL_SUB) {
+            if (subType != TYPE_NULL_SUB) {
                 canvas.drawLine(
                     x,
                     (mSubRect.top - mVolumeTopPadding).toFloat(),
@@ -687,7 +708,7 @@ abstract class BaseKChartView : ScaleScrollView {
 //        val pdd = metrics.bottom
         val baselineH = (textHeight - metrics.bottom - metrics.top) / 2
         val mainRow = max(
-            if (type == TYPE_NULL_SUB) klineAttribute.gridRows
+            if (subType == TYPE_NULL_SUB) klineAttribute.gridRows
             else klineAttribute.gridRows - 1, 2
         )
         val betweenItem = (mMainMaxVal - mMainMinVal) / (mainRow - 1)
