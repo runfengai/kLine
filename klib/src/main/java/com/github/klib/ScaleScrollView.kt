@@ -15,9 +15,13 @@ abstract class ScaleScrollView : RelativeLayout, GestureDetector.OnGestureListen
     ScaleGestureDetector.OnScaleGestureListener {
 
 
-    constructor(context: Context) : this(context, null)
+    constructor(context: Context) : super(context) {
+        initDetector()
+    }
 
-    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        initDetector()
+    }
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
@@ -82,13 +86,11 @@ abstract class ScaleScrollView : RelativeLayout, GestureDetector.OnGestureListen
 
     override fun setScrollX(scrollX: Int) {
         this.mScrollX = scrollX
-        Log.e("kline", "===>setScrollX()   x=$mScrollX")
         scrollTo(mScrollX, 0)
     }
 
 
     override fun scrollBy(x: Int, y: Int) {
-        Log.e("kline", "===>scrollBy()   x=${mScrollX - (x / mScaleX).roundToInt()}")
         scrollTo(mScrollX - (x / mScaleX).roundToInt(), 0)
     }
 
@@ -99,17 +101,11 @@ abstract class ScaleScrollView : RelativeLayout, GestureDetector.OnGestureListen
         }
         val oldX = mScrollX
         mScrollX = x
-        Log.e("kline", "mScrollX=======>$mScrollX  oldX=$oldX ")
-        //todo
         if (mScrollX < getMinScrollX()) {
             mScrollX = getMinScrollX()
             onRightSide()
             overScroller.forceFinished(true)
         } else if (mScrollX > getMaxScrollX()) {
-            Log.e(
-                "kline",
-                "mScrollX > getMaxScrollX()=======>${getMaxScrollX()}  mScrollX=$mScrollX  "
-            )
 //            mScrollX = getMaxScrollX()
             mScrollX = oldX
             onLeftSide()
@@ -122,7 +118,6 @@ abstract class ScaleScrollView : RelativeLayout, GestureDetector.OnGestureListen
     override fun computeScroll() {
         if (overScroller.computeScrollOffset()) {
             if (!inTouch) {
-                Log.e("kline", "===>computeScroll()   overScroller.currX=${overScroller.currX}")
                 scrollTo(overScroller.currX, 0)
             } else {
                 overScroller.forceFinished(true)
@@ -150,11 +145,11 @@ abstract class ScaleScrollView : RelativeLayout, GestureDetector.OnGestureListen
         velocityY: Float
     ): Boolean {
         if (!inTouch && isScrollEnable) {
-            val velocityS=velocityX / mScrollX
+            val velocityS = velocityX / mScaleX
             overScroller.fling(
                 mScrollX,
                 0,
-                if(velocityS.isNaN()) 0 else velocityS.roundToInt(),
+                if (velocityS.isNaN()) 0 else velocityS.roundToInt(),
                 0,
                 Int.MIN_VALUE,
                 Int.MAX_VALUE,

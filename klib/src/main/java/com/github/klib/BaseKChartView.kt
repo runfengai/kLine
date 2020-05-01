@@ -630,9 +630,23 @@ abstract class BaseKChartView : ScaleScrollView {
             )
             //
             mSelectedCirclePaint.color = mSelectedCircle0Color
-            canvas.drawCircle(x, y, klineAttribute.candleWidth / 2, mSelectedCirclePaint)
+            val r1 = klineAttribute.candleWidth / 2
+            canvas.drawOval(
+                x - r1 / mScaleX,
+                y - r1,
+                x + r1 / mScaleX,
+                y + r1,
+                mSelectedCirclePaint
+            )
             mSelectedCirclePaint.color = mSelectedCircle1Color
-            canvas.drawCircle(x, y, klineAttribute.candleWidth * 3 / 2, mSelectedCirclePaint)
+            val r2 = klineAttribute.candleWidth * 1.5f
+            canvas.drawOval(
+                x - r2 / mScaleX,
+                y - r2,
+                x + r2 / mScaleX,
+                y + r2,
+                mSelectedCirclePaint
+            )
             if (type != TYPE_NULL_SUB) {
                 canvas.drawLine(
                     x,
