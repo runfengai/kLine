@@ -1,7 +1,6 @@
 package com.github.kline
 
 import android.os.Bundle
-import android.view.View
 import android.widget.CheckBox
 import android.widget.RadioButton
 import androidx.appcompat.app.AppCompatActivity
@@ -10,6 +9,8 @@ import com.github.klib.KlineConfig
 import com.github.klib.entity.DefValueFormatter
 import com.github.klib.entity.KEntity
 import com.github.kline.GlobalConstant.TAG_AN_HOUR
+import com.github.kline.entity.KData
+import com.github.kline.entity.ResponseEntity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*

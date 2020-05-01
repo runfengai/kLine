@@ -26,13 +26,15 @@ class WRView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity> {
         canvas: Canvas,
         position: Int
     ) {
-        canvas.drawLine(
-            lastX,
-            baseKChartView.getSubY(lastPoint.wr),
-            currX,
-            baseKChartView.getSubY(currPoint.wr),
-            paint
-        )
+        if (position>=14){
+            canvas.drawLine(
+                lastX,
+                baseKChartView.getSubY(lastPoint.wr),
+                currX,
+                baseKChartView.getSubY(currPoint.wr),
+                paint
+            )
+        }
     }
 
     override fun drawText(canvas: Canvas, position: Int, x: Float, y: Float) {

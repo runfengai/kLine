@@ -46,20 +46,24 @@ class VolumeView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntit
     ) {
         drawVol(currPoint, currX, canvas)
         //绘制ma5,ma10
-        canvas.drawLine(
-            lastX,
-            baseKchartView.getVolumeY(lastPoint.ma5Volume),
-            currX,
-            baseKchartView.getVolumeY(currPoint.ma5Volume),
-            volMa5Paint
-        )
-        canvas.drawLine(
-            lastX,
-            baseKchartView.getVolumeY(lastPoint.ma10Volume),
-            currX,
-            baseKchartView.getVolumeY(currPoint.ma10Volume),
-            volMa10Paint
-        )
+        if (lastPoint.ma5Volume != 0f && position >= 5) {
+            canvas.drawLine(
+                lastX,
+                baseKchartView.getVolumeY(lastPoint.ma5Volume),
+                currX,
+                baseKchartView.getVolumeY(currPoint.ma5Volume),
+                volMa5Paint
+            )
+        }
+        if (lastPoint.ma10Volume != 0f && position >= 10) {
+            canvas.drawLine(
+                lastX,
+                baseKchartView.getVolumeY(lastPoint.ma10Volume),
+                currX,
+                baseKchartView.getVolumeY(currPoint.ma10Volume),
+                volMa10Paint
+            )
+        }
     }
 
     //绘制量

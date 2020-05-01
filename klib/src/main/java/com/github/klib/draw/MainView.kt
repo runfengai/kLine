@@ -82,7 +82,7 @@ class MainView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity>
     ) {
         drawCandle(canvas, currX, currPoint)
         if (showMa) {
-            if (lastPoint.MA5 != 0f) {
+            if (lastPoint.MA5 != 0f && position >= 5) {
                 canvas.drawLine(
                     lastX,
                     baseKChartView.getMainY(lastPoint.MA5),
@@ -91,7 +91,7 @@ class MainView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity>
                     ma5Paint
                 )
             }
-            if (lastPoint.MA10 != 0f) {
+            if (lastPoint.MA10 != 0f && position >= 10) {
                 canvas.drawLine(
                     lastX,
                     baseKChartView.getMainY(lastPoint.MA10),
@@ -100,7 +100,7 @@ class MainView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity>
                     ma10Paint
                 )
             }
-            if (lastPoint.MA30 != 0f) {
+            if (lastPoint.MA30 != 0f && position >= 30) {
                 canvas.drawLine(
                     lastX,
                     baseKChartView.getMainY(lastPoint.MA30),
