@@ -226,7 +226,7 @@ class KChartView : BaseKChartView {
             R.styleable.KChartView_timeLineShaderColorTop,
             getColor(R.color.kline_time_line_shader_color_top)
         )
-        klineAttribute.timeLineColor = typedArray.getColor(
+        klineAttribute.timeLineShaderColorBtm = typedArray.getColor(
             R.styleable.KChartView_timeLineShaderColorBtm,
             getColor(R.color.kline_time_line_shader_color_btm)
         )
