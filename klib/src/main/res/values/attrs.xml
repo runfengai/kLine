@@ -44,4 +44,12 @@
         <attr name="timeLineShaderColorTop" format="color" />
         <attr name="timeLineShaderColorBtm" format="color" />
     </declare-styleable>
+
+    <declare-styleable name="DepthView">
+        <attr name="topLineWidth" format="dimension" />
+        <attr name="buyColor" format="color" />
+        <attr name="sellColor" format="color" />
+        <attr name="buyFillColor" format="color" />
+        <attr name="sellFillColor" format="color" />
+    </declare-styleable>
 </resources>

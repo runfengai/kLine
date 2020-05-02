@@ -9,11 +9,11 @@
     <color name="kline_ma30">#A690C5</color>
     <color name="kline_selector_background">#cc0A1C30</color>
     <color name="kline_selector_line_row_color">#B0C0D1</color>
-<!--    50%透明度-->
+    <!--    50%透明度-->
     <color name="kline_selector_line_column_color">#7fB0C0D1</color>
     <color name="kline_selector_line_column_color_half">#00B0C0D1</color>
     <color name="kline_selector_circle_0_color">#B0C0D1</color>
-<!--    40%透明度-->
+    <!--    40%透明度-->
     <color name="kline_selector_circle_1_color">#6cB0C0D1</color>
     <color name="kline_candle_up_color">#02AF7B</color>
     <color name="kline_candle_down_color">#f15057</color>
@@ -21,4 +21,9 @@
     <color name="kline_time_line_color">#7293C0</color>
     <color name="kline_time_line_shader_color_top">#50688FDB</color>
     <color name="kline_time_line_shader_color_btm">#10688FDB</color>
+    <!--    深度-->
+    <color name="kline_depth_buy_color">#50A493</color>
+    <color name="kline_depth_sell_color">#DE5055</color>
+    <color name="kline_depth_buy_fill_color">#cc50A493</color>
+    <color name="kline_depth_sell_fill_color">#ccDE5055</color>
 </resources>
