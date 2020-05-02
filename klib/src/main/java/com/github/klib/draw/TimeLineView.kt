@@ -60,7 +60,7 @@ class TimeLineView(private val baseKChartView: BaseKChartView) : IChartDraw<KEnt
                         baseKChartView.klineAttribute.timeLineShaderColorTop,
                         baseKChartView.klineAttribute.timeLineShaderColorBtm
                     ),
-                    null, Shader.TileMode.REPEAT
+                    null, Shader.TileMode.CLAMP
                 )
 
                 timeLinePath.moveTo(currX, currY)
