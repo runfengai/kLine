@@ -106,7 +106,7 @@ abstract class ScaleScrollView : RelativeLayout, GestureDetector.OnGestureListen
             onRightSide()
             overScroller.forceFinished(true)
         } else if (mScrollX > getMaxScrollX()) {
-//            mScrollX = getMaxScrollX()
+            mScrollX = getMaxScrollX()
             mScrollX = oldX
             onLeftSide()
             overScroller.forceFinished(true)
@@ -246,7 +246,10 @@ abstract class ScaleScrollView : RelativeLayout, GestureDetector.OnGestureListen
      *检查修正滑动
      */
     protected fun checkAndFixScrollX() {
-        Log.e("kline", "checkAndFixScrollX  ====>mScrollX=$mScrollX")
+        Log.e(
+            "kline",
+            "checkAndFixScrollX  ====>mScrollX=$mScrollX   getMaxScrollX()=${getMaxScrollX()}"
+        )
         if (mScrollX < getMinScrollX()) {
             mScrollX = getMinScrollX()
             overScroller.forceFinished(true)

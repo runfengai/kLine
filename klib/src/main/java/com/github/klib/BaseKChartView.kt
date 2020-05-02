@@ -348,7 +348,8 @@ abstract class BaseKChartView : ScaleScrollView {
      */
     override fun getMinScrollX(): Int = -(mOverScrollRange / mScaleX).toInt()
 
-    override fun getMaxScrollX(): Int = round(getMaxTranslateX() - getMinTranslateX()).toInt()
+    override fun getMaxScrollX(): Int =
+        round(getMaxTranslateX() - getMinTranslateX() + mPointWidth / 2).toInt()
 
     //
     fun addVolumeDraw(item: IChartDraw<KEntity>) {

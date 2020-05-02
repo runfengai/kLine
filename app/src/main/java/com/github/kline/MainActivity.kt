@@ -60,16 +60,26 @@ class MainActivity : AppCompatActivity() {
 
     private fun listeners() {
         mainMa.setOnCheckedChangeListener { _, isChecked ->
-            kChartView?.showMaAndBoll(showMa = isChecked)
+            //不用每次都设置
+            kChartView?.setMainType(KlineConfig.TYPE_MAIN_CANDLE)
+
+            kChartView?.showMaAndBoll(showMa = isChecked, showBoll = mainBoll.isChecked)
             if (isChecked) {
                 mainBoll.isChecked = false
             }
+
+            mainIsTimeLine.isChecked = false
         }
         mainBoll.setOnCheckedChangeListener { _, isChecked ->
-            kChartView?.showMaAndBoll(showBoll = isChecked)
+            //不用每次都设置
+            kChartView?.setMainType(KlineConfig.TYPE_MAIN_CANDLE)
+
+            kChartView?.showMaAndBoll(showMa = mainMa.isChecked, showBoll = isChecked)
             if (isChecked) {
                 mainMa.isChecked = false
             }
+
+            mainIsTimeLine.isChecked = false
         }
 
         mainIsTimeLine.setOnCheckedChangeListener { _, isChecked ->

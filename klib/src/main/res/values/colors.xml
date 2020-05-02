@@ -4,9 +4,9 @@
     <color name="kline_background">#0A1C30</color>
     <color name="kline_grid_line">#172A40</color>
 
-    <color name="kline_ma5">#18CCF6</color>
-    <color name="kline_ma10">#FE5EDF</color>
-    <color name="kline_ma30">#E7A520</color>
+    <color name="kline_ma5">#FCF5E0</color>
+    <color name="kline_ma10">#8FBCBB</color>
+    <color name="kline_ma30">#A690C5</color>
     <color name="kline_selector_background">#cc0A1C30</color>
     <color name="kline_selector_line_row_color">#B0C0D1</color>
 <!--    50%透明度-->
