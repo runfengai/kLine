@@ -6,8 +6,8 @@ package com.github.klib.entity
 class DepthEntity : Comparable<DepthEntity> {
     override fun compareTo(other: DepthEntity): Int {
         return when {
-            volume > other.volume -> 1
-            volume < other.volume -> -1
+            price > other.price -> 1
+            price < other.price -> -1
             else -> 0
         }
     }

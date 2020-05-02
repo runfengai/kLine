@@ -51,5 +51,11 @@
         <attr name="sellColor" format="color" />
         <attr name="buyFillColor" format="color" />
         <attr name="sellFillColor" format="color" />
+        <attr name="depth_gridLineColor" format="color" />
+        <attr name="depth_gridLineWidth" format="dimension" />
+        <attr name="gridRows" format="integer" />
+        <attr name="gridColumns" format="integer" />
+        <attr name="depthTextSize" format="dimension"/>
+        <attr name="depthTextColor" format="color" />
     </declare-styleable>
 </resources>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".DepthActivity">
+
+    <com.github.klib.DepthView
+        android:id="@+id/depthView"
+        android:layout_width="match_parent"
+        android:background="@color/my_background"
+        app:gridRows="5"
+        app:gridColumns="4"
+        android:layout_height="500dp" />
+</LinearLayout>

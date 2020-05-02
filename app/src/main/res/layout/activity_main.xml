@@ -65,6 +65,13 @@
                 android:textColor="@color/sel_checked"
                 tools:checked="true" />
 
+            <Button
+                android:layout_width="60dp"
+                android:layout_height="38dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="10dp"
+                android:text="深度图"
+                android:onClick="toDepth"/>
         </LinearLayout>
 
         <HorizontalScrollView

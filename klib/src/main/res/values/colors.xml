@@ -24,6 +24,8 @@
     <!--    深度-->
     <color name="kline_depth_buy_color">#50A493</color>
     <color name="kline_depth_sell_color">#DE5055</color>
-    <color name="kline_depth_buy_fill_color">#cc50A493</color>
-    <color name="kline_depth_sell_fill_color">#ccDE5055</color>
+    <color name="kline_depth_buy_fill_color">#3350A493</color>
+    <color name="kline_depth_sell_fill_color">#33DE5055</color>
+
+    <color name="kline_depth_text_color">#768AA7</color>
 </resources>

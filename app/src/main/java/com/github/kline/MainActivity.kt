@@ -1,6 +1,8 @@
 package com.github.kline
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.CheckBox
 import android.widget.RadioButton
 import androidx.appcompat.app.AppCompatActivity
@@ -157,5 +159,9 @@ class MainActivity : AppCompatActivity() {
 
 
         }
+    }
+
+    fun toDepth(v: View) {
+        startActivity(Intent(this, DepthActivity::class.java))
     }
 }

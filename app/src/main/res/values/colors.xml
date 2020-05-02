@@ -6,4 +6,6 @@
 
     <color name="greenColor">#02AF7B</color>
     <color name="redColor">#f15057</color>
+
+    <color name="my_background">#0A1C30</color>
 </resources>

@@ -7,4 +7,6 @@
     <string name="kline_change">涨跌额</string>
     <string name="kline_change_p">涨跌幅</string>
     <string name="kline_amount">成交量</string>
+    <string name="kline_depth_buy">买</string>
+    <string name="kline_depth_sell">卖</string>
 </resources>
