@@ -127,7 +127,9 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-
+    /**
+     * 模拟网络请求
+     */
     private fun fetchData() {
         GlobalScope.launch(Dispatchers.Main) {
             val res = withContext(Dispatchers.IO) {

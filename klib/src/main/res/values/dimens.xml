@@ -18,4 +18,5 @@
     <dimen name="kline_depth_top_Width">40dp</dimen>
     <dimen name="kline_depth_top_rect_size">6dp</dimen>
     <dimen name="kline_depth_text_size">10sp</dimen>
+    <dimen name="kline_depth_circle_radius">4sp</dimen>
 </resources>

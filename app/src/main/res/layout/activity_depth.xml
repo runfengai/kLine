@@ -10,8 +10,13 @@
     <com.github.klib.DepthView
         android:id="@+id/depthView"
         android:layout_width="match_parent"
+        android:layout_height="300dp"
         android:background="@color/my_background"
-        app:gridRows="5"
         app:gridColumns="4"
-        android:layout_height="500dp" />
+        app:gridRows="5" />
+
+    <com.github.klib.depth.DepthView
+        android:id="@+id/thirdView"
+        android:layout_width="match_parent"
+        android:layout_height="300dp" />
 </LinearLayout>

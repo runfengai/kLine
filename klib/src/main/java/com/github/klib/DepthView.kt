@@ -1,25 +1,35 @@
 package com.github.klib
 
+import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.RectF
+import android.os.Handler
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.core.content.ContextCompat
 import com.github.klib.entity.DepthEntity
 import com.github.klib.util.DensityUtil
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
+/**
+ * 深度图,启用
+ */
 class DepthView : View {
 
 
     private val buyList = mutableListOf<DepthEntity>()
     private val sellList = mutableListOf<DepthEntity>()
 
-    private val buyPaint = Paint()
-    private val sellPaint = Paint()
+    private val buyPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val sellPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val buyFillPaint = Paint()
     private val sellFillPaint = Paint()
     //线
@@ -61,6 +71,8 @@ class DepthView : View {
     private var textPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var topRectSize = 0f
     private var topTextPadding = 0
+    //长按选中后圆圈
+    private var depthCircleRadius: Float = 0f
 
 
     var gridRows = 5
@@ -140,6 +152,12 @@ class DepthView : View {
                 R.styleable.DepthView_depthTextColor,
                 getColor(R.color.kline_depth_text_color)
             )
+
+            depthCircleRadius = getDimension(
+                R.styleable.DepthView_depthCircleRadius,
+                getDimension(R.dimen.kline_depth_circle_radius)
+            )
+
             textPaint.textSize = textSize
             textPaint.color = textColor
 
@@ -186,12 +204,12 @@ class DepthView : View {
             buyPriceMin = min(buyPriceMin, buyList[i].price)
             buyPriceMax = max(buyPriceMax, buyList[i].price)
             if (i < buyList.size - 1) {
-                buyList[i].volume += buyList[i + 1].volume
+                buyList[i].amount += buyList[i + 1].amount
             } else {//最后一个，也就是price最高
-                buyVolumeMin = buyList[i].volume
+                buyVolumeMin = buyList[i].amount
             }
             if (i == 0) {//算总的volume
-                buyVolumeMax = buyList[i].volume
+                buyVolumeMax = buyList[i].amount
             }
         }
 
@@ -199,12 +217,12 @@ class DepthView : View {
             sellPriceMin = min(sellPriceMin, sellList[i].price)
             sellPriceMax = max(sellPriceMax, sellList[i].price)
             if (i > 0) {
-                sellList[i].volume += sellList[i - 1].volume
+                sellList[i].amount += sellList[i - 1].amount
             } else {
-                sellVolumeMin = sellList[i].volume
+                sellVolumeMin = sellList[i].amount
             }
             if (i == sellList.size - 1) {
-                sellVolumeMax = sellList[i].volume
+                sellVolumeMax = sellList[i].amount
             }
 
         }
@@ -212,6 +230,25 @@ class DepthView : View {
         priceMiddle = buyPriceMax / 2 + sellPriceMin / 2
 
 
+        val drawHeight = mHeight - mTopWidth - mBottomPadding
+        volumeSpace = drawHeight / volumeCount
+        volumeMax = max(buyVolumeMax, sellVolumeMax)
+        volumeItem = volumeMax / volumeCount //固定的
+
+        //计算x,y坐标并赋值
+        for (i in 0 until buyList.size) {
+            val currX = getBuyXByPrice(buyList[i].price)
+            val currY = getYByVolume(buyList[i].amount)
+            buyList[i].x = currX
+            buyList[i].y = currY
+        }
+        //计算x,y坐标并赋值
+        for (i in 0 until sellList.size) {
+            val currX = getBuyXByPrice(sellList[i].price)
+            val currY = getYByVolume(sellList[i].amount)
+            sellList[i].x = currX
+            sellList[i].y = currY
+        }
     }
 
     private var mWidth = 0
@@ -241,7 +278,9 @@ class DepthView : View {
         drawTop(canvas)
         drawLeft(canvas)
         drawRight(canvas)
+        drawSelected(canvas)
     }
+
 
     var showLeft = true
     var showRight = false
@@ -256,10 +295,7 @@ class DepthView : View {
      * 绘制value
      */
     private fun drawValue(canvas: Canvas) {
-        val drawHeight = mHeight - mTopWidth - mBottomPadding
-        volumeSpace = drawHeight / volumeCount
-        volumeMax = max(buyVolumeMax, sellVolumeMax)
-        volumeItem = volumeMax / volumeCount //固定的
+
 
         for (i in volumeCount downTo 1) {
             if (showLeft) {
@@ -359,7 +395,7 @@ class DepthView : View {
     private fun getYByVolume(volume: Float): Float {
         val drawHeight = mHeight - mTopWidth - mBottomPadding
         val scale = volume / volumeMax
-        return max(drawHeight * (1 - scale), mTopWidth)
+        return mTopWidth + drawHeight * (1 - scale)
     }
 
     private fun getBuyXByPrice(price: Float): Float {
@@ -371,9 +407,9 @@ class DepthView : View {
     /**
      * 根据volume算出对应y值
      */
-//    private fun getSellYByVolume(volume: Float): Float {
+//    private fun getSellYByVolume(amount: Float): Float {
 //        val drawHeight = mHeight - mTopWidth - mBottomPadding
-//        val scale = volume / volumeMax
+//        val scale = amount / volumeMax
 //        return max(drawHeight * (1 - scale), mTopWidth)
 //    }
 
@@ -389,44 +425,37 @@ class DepthView : View {
      */
     private fun drawLeft(canvas: Canvas) {
         for (i in 0 until buyList.size) {
-            val currX = getBuyXByPrice(buyList[i].price)
-            val currY = getYByVolume(buyList[i].volume)
+
             when (i) {
                 0 -> {
                     buyPath.lineTo(
-                        currX,
-                        currY
+                        buyList[i].x,
+                        buyList[i].y
                     )
 
                     buyFillPath.moveTo(
-                        currX
+                        buyList[i].x
                         ,
                         (mHeight - mBottomPadding).toFloat()
                     )
                     buyFillPath.lineTo(
-                        currX,
-                        currY
+                        buyList[i].x,
+                        buyList[i].y
                     )
                 }
                 buyList.size - 1 -> {
                     buyPath.lineTo(
-                        currX,
-                        currY
+                        buyList[i].x,
+                        buyList[i].y
                     )
-                    buyPath.lineTo(
-                        currX,
-                        (mHeight - mBottomPadding - 0.5f)
-                    )
+
                     buyPath.lineTo(mWidth / 2f, (mHeight - mBottomPadding).toFloat())
 
                     buyFillPath.lineTo(
-                        currX,
-                        currY
+                        buyList[i].x,
+                        buyList[i].y
                     )
-                    buyFillPath.lineTo(
-                        currX,
-                        (mHeight - mBottomPadding - 0.5f)
-                    )
+
                     buyFillPath.lineTo(mWidth / 2f, (mHeight - mBottomPadding).toFloat())
                     buyFillPath.close()
 
@@ -438,12 +467,12 @@ class DepthView : View {
                 }
                 else -> {
                     buyPath.lineTo(
-                        currX,
-                        currY
+                        buyList[i].x,
+                        buyList[i].y
                     )
                     buyFillPath.lineTo(
-                        currX,
-                        currY
+                        buyList[i].x,
+                        buyList[i].y
                     )
                 }
             }
@@ -455,43 +484,38 @@ class DepthView : View {
      */
     private fun drawRight(canvas: Canvas) {
         for (i in 0 until sellList.size) {
-            val currX = getSellXByPrice(sellList[i].price)
-            val currY = getYByVolume(sellList[i].volume)
             when (i) {
                 0 -> {
                     sellPath.moveTo(mWidth / 2f, (mHeight - mBottomPadding).toFloat())
+
                     sellPath.lineTo(
-                        currX,
-                        (mHeight - mBottomPadding - 0.5f)
-                    )
-                    sellPath.lineTo(
-                        currX,
-                        currY
+                        sellList[i].x,
+                        sellList[i].y
                     )
 
                     sellFillPath.moveTo(mWidth / 2f, (mHeight - mBottomPadding).toFloat())
+//                    sellFillPath.lineTo(
+//                        sellList[i].x,
+//                        (mHeight - mBottomPadding - 0.5f)
+//                    )
                     sellFillPath.lineTo(
-                        currX,
-                        (mHeight - mBottomPadding - 0.5f)
-                    )
-                    sellFillPath.lineTo(
-                        currX,
-                        currY
+                        sellList[i].x,
+                        sellList[i].y
                     )
 
 
                 }
                 sellList.size - 1 -> {
                     sellPath.lineTo(
-                        currX,
-                        currY
+                        sellList[i].x,
+                        sellList[i].y
                     )
 
                     sellFillPath.lineTo(
-                        currX,
-                        currY
+                        sellList[i].x,
+                        sellList[i].y
                     )
-                    sellFillPath.lineTo(currX, (mHeight - mBottomPadding).toFloat())
+                    sellFillPath.lineTo(sellList[i].x, (mHeight - mBottomPadding).toFloat())
                     sellFillPath.close()
 
                     canvas.drawPath(sellFillPath, sellFillPaint)
@@ -502,12 +526,12 @@ class DepthView : View {
                 }
                 else -> {
                     sellPath.lineTo(
-                        currX,
-                        currY
+                        sellList[i].x,
+                        sellList[i].y
                     )
                     sellFillPath.lineTo(
-                        currX,
-                        currY
+                        sellList[i].x,
+                        sellList[i].y
                     )
                 }
             }
@@ -543,6 +567,158 @@ class DepthView : View {
         }
     }
 
+    private var inTouch: Boolean = false
+    private var isLongPress: Boolean = false
+
+    private var startX: Float = 0f
+    private var startY: Float = 0f
+    private var touchX: Float = 0f
+    private var touchY: Float = 0f
+    //要高亮的位置
+    private var highLightX: Float = 0f
+    private var highLightY: Float = 0f
+
+    //    private var touchPosition = 0
+    private var isLeftTouch = true
+    //长按的点对应在折线上的y坐标
+    private var touchYOfLine = 0f
+
+    var startTime: Long = 0L
+
+    private val LONG_PRESS_TIME = 500L
+
+    private val TOUCH_MAX = 50
+
+    private var mHandler = Handler()
+    private val longPressedRunnable = Runnable {
+        isLongPress = true
+        highLightX = startX
+        highLightY = startY
+        getTopLineYByX(startX)
+        invalidate()
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        val ev = event ?: return super.onTouchEvent(event)
+        when (ev.action) {
+            MotionEvent.ACTION_DOWN -> {
+                inTouch = true
+                startTime = System.currentTimeMillis()
+                startX = ev.x
+                startY = ev.y
+                mHandler.postDelayed(longPressedRunnable, LONG_PRESS_TIME)
+            }
+            MotionEvent.ACTION_MOVE -> {
+                touchX = ev.x
+                touchY = ev.y
+                if (abs(touchX - startX) > TOUCH_MAX) {
+                    mHandler.removeCallbacks(longPressedRunnable)
+                    getTopLineYByX(ev.x)
+                    highLightX = touchX
+                    highLightY = touchY
+                }
+                invalidate()
+            }
+            MotionEvent.ACTION_UP -> {
+                mHandler.removeCallbacks(longPressedRunnable)
+                val endTime = System.currentTimeMillis()
+                isLongPress = endTime > startTime + LONG_PRESS_TIME
+                inTouch = false
+                invalidate()
+            }
+            MotionEvent.ACTION_CANCEL -> {
+                inTouch = false
+                isLongPress = false
+                invalidate()
+            }
+        }
+
+        return true
+    }
+
+    /**
+     * 获取触摸的位置
+     */
+    private fun getTopLineYByX(x: Float) {
+        when {//左边区域
+            x <= mWidth / 2 -> {
+                isLeftTouch = true
+                touchYOfLine = getLeftYByX(x)
+            }
+            else -> {
+                isLeftTouch = false
+                touchYOfLine = getRightYByX(x)
+            }
+        }
+    }
+
+    /**
+     * 绘制选中区域
+     */
+    private fun drawSelected(canvas: Canvas) {
+        if (inTouch or isLongPress) {
+            val paint = if (isLeftTouch) buyPaint else sellPaint
+//            val list = if (isLeftTouch) buyList else sellList
+            canvas.drawCircle(highLightX, touchYOfLine, depthCircleRadius, paint)
+        }
+    }
+
+    /**
+     * 根据x坐标获取对应position
+     */
+    private fun getLeftYByX(x: Float): Float {
+        val scale = x / (mWidth / 2)
+        val price = scale * (priceMiddle - buyPriceMin) + buyPriceMin
+        //二分查找
+        if (price > buyList[buyList.size - 1].price) {//最后一个
+            val lastX = buyList[buyList.size - 1].x
+            val lastY = buyList[buyList.size - 1].y
+            return (x - lastX) / (mWidth / 2 - lastX) * (mHeight - mBottomPadding - mTopWidth - lastY) + lastY
+        }
+        return searchVolumeIndex(price, buyList, x)
+    }
+
+    /**
+     * 根据x坐标获取对应position
+     */
+    private fun getRightYByX(x: Float): Float {
+        val scale = (x - mWidth / 2) / (mWidth / 2)
+        val price = scale * (sellPriceMax - priceMiddle) + priceMiddle
+        //
+        return searchVolumeIndex(price, sellList, x)
+    }
+
+    /**
+     * 二分查找 点对应的y
+     */
+    private fun searchVolumeIndex(price: Float, list: List<DepthEntity>, x: Float): Float {
+        return searchVolumeIndex(price, list, 0, list.size - 1, x)
+    }
+
+    private fun searchVolumeIndex(
+        price: Float,
+        list: List<DepthEntity>,
+        startIndex: Int,
+        endIndex: Int, x: Float
+    ): Float {
+        if (endIndex == startIndex + 1) {
+
+            return x / list[startIndex].x * list[startIndex].y
+
+//            return (mWidth / 2 - x) / (mWidth / 2 - list[startIndex].x) * list[startIndex].amount
+//            return list[startIndex].amount + (list[endIndex].amount - list[startIndex].amount) / 2
+        } else if (startIndex == endIndex) {
+            return list[startIndex].y
+        }
+        val mid = startIndex + (endIndex - startIndex) / 2
+        return when {
+            price < list[mid].price -> searchVolumeIndex(price, list, startIndex, mid - 1, x)
+            price > buyList[mid].price -> searchVolumeIndex(price, list, mid + 1, endIndex, x)
+            else -> list[mid].y
+        }
+
+    }
 
     fun getDimension(@DimenRes dimenId: Int): Float {
         return resources.getDimension(dimenId)

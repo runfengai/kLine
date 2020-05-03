@@ -211,9 +211,9 @@ abstract class BaseKChartView : ScaleScrollView {
     /**
      * 限定三块的区域所占高度的比例，以及尺寸：
      * （1）有副图
-     * main:volume:副=3:1:1
+     * main:amount:副=3:1:1
      * （2）无副图
-     * main:volume=3:1
+     * main:amount=3:1
      */
     private fun initRect(w: Int, h: Int) {
         mWidth = w
@@ -500,7 +500,7 @@ abstract class BaseKChartView : ScaleScrollView {
                 mMainMaxVal = 1f
             }
         }
-        //volume
+        //amount
         if (mVolumeMaxVal == mVolumeMinVal) {
             val pdd = mVolumeMaxVal * 0.05f
             mVolumeMaxVal += pdd
@@ -547,12 +547,10 @@ abstract class BaseKChartView : ScaleScrollView {
         }
         val mid = start + (end - start) / 2
         val midVal = getXByIndex(mid)
-        if (translateX < midVal) {
-            return indexOfTranslateX(translateX, start, mid)
-        } else if (translateX > midVal) {
-            return indexOfTranslateX(translateX, mid + 1, end)
-        } else {
-            return mid
+        return when {
+            translateX < midVal -> indexOfTranslateX(translateX, start, mid)
+            translateX > midVal -> indexOfTranslateX(translateX, mid + 1, end)
+            else -> mid
         }
     }
 
