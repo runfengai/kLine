@@ -226,10 +226,10 @@ public class DepthView extends View {
         pricePrecision = 8;
 
         if (TextUtils.isEmpty(detailPriceTitle)) {
-            detailPriceTitle = "价格(BTC)：";
+            detailPriceTitle = "price：";
         }
         if (TextUtils.isEmpty(detailVolumeTitle)) {
-            detailVolumeTitle = "累积交易量：";
+            detailVolumeTitle = "volume：";
         }
 
         moveLimitDistance = ViewConfiguration.get(getContext()).getScaledTouchSlop();
@@ -245,6 +245,7 @@ public class DepthView extends View {
         singleClickDisappearRunnable = new Runnable() {
             @Override
             public void run() {
+                isLongPress = false;
                 isShowDetail = false;
                 invalidate();
             }
@@ -549,7 +550,7 @@ public class DepthView extends View {
     }
 
     private void drawDetailData(Canvas canvas) {
-        if (!isShowDetail || clickDepth == null) {
+        if (!isShowDetail || clickDepth == null || !isLongPress) {
             return;
         }
         //游标线

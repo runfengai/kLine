@@ -20,7 +20,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 /**
- * 深度图,启用
+ * 深度图,弃用
  */
 class DepthView : View {
 
@@ -106,7 +106,7 @@ class DepthView : View {
             setAttrs(this)
         }
         mTopWidth = getDimension(R.dimen.kline_depth_top_Width)
-        mBottomPadding = getDimension(R.dimen.kline_padding).toInt()
+        mBottomPriceHeight = getDimension(R.dimen.kline_padding).toInt()
         topRectSize = getDimension(R.dimen.kline_depth_top_rect_size)
         topTextPadding = DensityUtil.dip2px(context, 6f)
         buyText = context.getString(R.string.kline_depth_buy)
@@ -132,7 +132,7 @@ class DepthView : View {
                 R.styleable.DepthView_topLineWidth,
                 getDimension(R.dimen.kline_depth_line_width)
             )
-            gridRows = getInteger(R.styleable.DepthView_gridRows, 5)
+            this@DepthView.gridRows = getInteger(R.styleable.DepthView_gridRows, 5)
             gridColumns = getInteger(R.styleable.DepthView_gridColumns, 4)
 
             mGridPaint.color =
@@ -229,30 +229,31 @@ class DepthView : View {
 
         priceMiddle = buyPriceMax / 2 + sellPriceMin / 2
 
-
-        val drawHeight = mHeight - mTopWidth - mBottomPadding
-        volumeSpace = drawHeight / volumeCount
+        //计算volume
+        val drawHeight = mHeight - mTopWidth - mBottomPriceHeight
+        volumeSpace = drawHeight / this.gridRows
         volumeMax = max(buyVolumeMax, sellVolumeMax)
-        volumeItem = volumeMax / volumeCount //固定的
+        val volumeMin = min(buyVolumeMin, sellVolumeMin)
+        volumeItem = volumeMax / this.gridRows //固定的
+        //每一单位volume对应的高度
+        val avgHeightPerVolume = drawHeight / (volumeMax - volumeMin)
+        val avgWidthPreSize = mWidth.toFloat() / (buyList.size + sellList.size)
 
         //计算x,y坐标并赋值
         for (i in 0 until buyList.size) {
-            val currX = getBuyXByPrice(buyList[i].price)
-            val currY = getYByVolume(buyList[i].amount)
-            buyList[i].x = currX
-            buyList[i].y = currY
+            buyList[i].x = avgWidthPreSize * i
+            buyList[i].y = mTopWidth + (volumeMax - buyList[i].amount) * avgHeightPerVolume
         }
         //计算x,y坐标并赋值
         for (i in 0 until sellList.size) {
-            val currX = getBuyXByPrice(sellList[i].price)
-            val currY = getYByVolume(sellList[i].amount)
-            sellList[i].x = currX
-            sellList[i].y = currY
+            sellList[i].x = mWidth - (sellList.size - 1 - i) * avgWidthPreSize
+            sellList[i].y = mTopWidth + (volumeMax - sellList[i].amount) * avgHeightPerVolume
         }
+
     }
 
-    private var mWidth = 0
-    private var mHeight = 0
+    private var mWidth = 0f
+    private var mHeight = 0f
     /**
      * 精度
      */
@@ -261,15 +262,27 @@ class DepthView : View {
      * 顶部，需要留出位置显示买卖方向
      */
     var mTopWidth = 0f
-
+    private var leftStart: Float = 0f
+    private var topStart: Float = 0f
+    private var rightEnd: Float = 0f
+    private var bottomEnd: Float = 0f
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        mWidth = w
-        mHeight = h
+        mWidth = w.toFloat()
+        mHeight = h.toFloat()
+    }
+
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onLayout(changed, left, top, right, bottom)
+        leftStart = (paddingLeft + 1).toFloat()
+        topStart = (paddingTop + 1).toFloat()
+        rightEnd = (measuredWidth - paddingRight - 1).toFloat()
+        bottomEnd = (measuredHeight - paddingBottom - 1).toFloat()
 
 
     }
+
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas ?: return)
@@ -286,8 +299,8 @@ class DepthView : View {
     var showRight = false
     //volume最大值
     private var volumeMax: Float = 0f
+    //显示用的
     private var volumeItem: Float = 0f
-    private var volumeCount = 5//横坐标数量
     private var volumeSpace: Float = 0f
 
 
@@ -297,7 +310,7 @@ class DepthView : View {
     private fun drawValue(canvas: Canvas) {
 
 
-        for (i in volumeCount downTo 1) {
+        for (i in this.gridRows downTo 1) {
             if (showLeft) {
                 canvas.drawText(
                     getFormatValue(volumeMax - (i - 1) * volumeItem),
@@ -322,21 +335,21 @@ class DepthView : View {
         canvas.drawText(
             getFormatValue(buyPriceMin),
             topTextPadding.toFloat(),
-            mHeight - mBottomPadding + textH,
+            mHeight - mBottomPriceHeight + textH,
             textPaint
         )
         val middleText = getFormatValue(priceMiddle)
         canvas.drawText(
             middleText,
             mWidth / 2 - textPaint.measureText(middleText) / 2,
-            mHeight - mBottomPadding + textH,
+            mHeight - mBottomPriceHeight + textH,
             textPaint
         )
         val endText = getFormatValue(sellPriceMax)
         canvas.drawText(
             endText,
             mWidth - textPaint.measureText(endText) - topTextPadding.toFloat(),
-            mHeight - mBottomPadding + textH,
+            mHeight - mBottomPriceHeight + textH,
             textPaint
         )
 
@@ -389,36 +402,6 @@ class DepthView : View {
 
     }
 
-    /**
-     * 根据volume算出对应y值
-     */
-    private fun getYByVolume(volume: Float): Float {
-        val drawHeight = mHeight - mTopWidth - mBottomPadding
-        val scale = volume / volumeMax
-        return mTopWidth + drawHeight * (1 - scale)
-    }
-
-    private fun getBuyXByPrice(price: Float): Float {
-        val drawWidth = mWidth / 2
-        val scale = (price - buyPriceMin) / (priceMiddle - buyPriceMin)
-        return drawWidth * scale
-    }
-
-    /**
-     * 根据volume算出对应y值
-     */
-//    private fun getSellYByVolume(amount: Float): Float {
-//        val drawHeight = mHeight - mTopWidth - mBottomPadding
-//        val scale = amount / volumeMax
-//        return max(drawHeight * (1 - scale), mTopWidth)
-//    }
-
-    private fun getSellXByPrice(price: Float): Float {
-        val drawWidth = mWidth / 2
-        val scale = (price - priceMiddle) / (sellPriceMax - priceMiddle)
-        return drawWidth * scale + mWidth / 2
-    }
-
 
     /**
      * 绘制买区域
@@ -428,7 +411,7 @@ class DepthView : View {
 
             when (i) {
                 0 -> {
-                    buyPath.lineTo(
+                    buyPath.moveTo(
                         buyList[i].x,
                         buyList[i].y
                     )
@@ -436,7 +419,7 @@ class DepthView : View {
                     buyFillPath.moveTo(
                         buyList[i].x
                         ,
-                        (mHeight - mBottomPadding).toFloat()
+                        (mHeight - mBottomPriceHeight)
                     )
                     buyFillPath.lineTo(
                         buyList[i].x,
@@ -449,14 +432,12 @@ class DepthView : View {
                         buyList[i].y
                     )
 
-                    buyPath.lineTo(mWidth / 2f, (mHeight - mBottomPadding).toFloat())
-
                     buyFillPath.lineTo(
                         buyList[i].x,
                         buyList[i].y
                     )
 
-                    buyFillPath.lineTo(mWidth / 2f, (mHeight - mBottomPadding).toFloat())
+                    buyFillPath.lineTo(buyList[i].x, (mHeight - mBottomPriceHeight))
                     buyFillPath.close()
 
                     canvas.drawPath(buyFillPath, buyFillPaint)
@@ -486,17 +467,14 @@ class DepthView : View {
         for (i in 0 until sellList.size) {
             when (i) {
                 0 -> {
-                    sellPath.moveTo(mWidth / 2f, (mHeight - mBottomPadding).toFloat())
-
-                    sellPath.lineTo(
+                    sellPath.moveTo(
                         sellList[i].x,
                         sellList[i].y
                     )
 
-                    sellFillPath.moveTo(mWidth / 2f, (mHeight - mBottomPadding).toFloat())
 //                    sellFillPath.lineTo(
 //                        sellList[i].x,
-//                        (mHeight - mBottomPadding - 0.5f)
+//                        (mHeight - mBottomPriceHeight - 0.5f)
 //                    )
                     sellFillPath.lineTo(
                         sellList[i].x,
@@ -515,7 +493,7 @@ class DepthView : View {
                         sellList[i].x,
                         sellList[i].y
                     )
-                    sellFillPath.lineTo(sellList[i].x, (mHeight - mBottomPadding).toFloat())
+                    sellFillPath.lineTo(sellList[i].x, (mHeight - mBottomPriceHeight).toFloat())
                     sellFillPath.close()
 
                     canvas.drawPath(sellFillPath, sellFillPaint)
@@ -539,7 +517,10 @@ class DepthView : View {
     }
 
     private var rowSpace = 0f
-    private var mBottomPadding = 0
+    /**
+     * 底部显示价格的区域高度
+     */
+    private var mBottomPriceHeight = 0
     //网格线
     private val mGridPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
@@ -547,14 +528,14 @@ class DepthView : View {
      * 绘制线
      */
     private fun drawGrid(canvas: Canvas) {
-        if (gridRows > 0) {
+        if (this.gridRows > 0) {
             //        主图
             val widthF = mWidth.toFloat()
             val heightF = mHeight.toFloat()
             rowSpace =
-                (heightF - mTopWidth - mBottomPadding) / gridRows
+                (heightF - mTopWidth - mBottomPriceHeight) / this.gridRows
 
-            for (i in 0..gridRows) {
+            for (i in 0..this.gridRows) {
                 val startY = rowSpace * i + mTopWidth
                 canvas.drawLine(0f, startY, widthF, startY, mGridPaint)
             }
@@ -562,7 +543,7 @@ class DepthView : View {
             val columnSpace = widthF / gridColumns
             for (i in 1 until gridColumns) {
                 val startX = columnSpace * i.toFloat()
-                canvas.drawLine(startX, 0f, startX, heightF - mBottomPadding, mGridPaint)
+                canvas.drawLine(startX, 0f, startX, heightF - mBottomPriceHeight, mGridPaint)
             }
         }
     }
@@ -674,7 +655,7 @@ class DepthView : View {
         if (price > buyList[buyList.size - 1].price) {//最后一个
             val lastX = buyList[buyList.size - 1].x
             val lastY = buyList[buyList.size - 1].y
-            return (x - lastX) / (mWidth / 2 - lastX) * (mHeight - mBottomPadding - mTopWidth - lastY) + lastY
+            return (x - lastX) / (mWidth / 2 - lastX) * (mHeight - mBottomPriceHeight - mTopWidth - lastY) + lastY
         }
         return searchVolumeIndex(price, buyList, x)
     }
