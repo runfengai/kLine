@@ -178,8 +178,8 @@ class DepthView : View {
     fun setData(buyList: List<DepthEntity>, sellList: List<DepthEntity>) {
         setBuyList(buyList)
         setSellList(sellList)
-        calculate()
-        invalidate()
+
+        requestLayout()
     }
 
     private fun setSellList(sellList: List<DepthEntity>) {
@@ -271,6 +271,7 @@ class DepthView : View {
         super.onSizeChanged(w, h, oldw, oldh)
         mWidth = w.toFloat()
         mHeight = h.toFloat()
+        calculate()
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
@@ -419,7 +420,7 @@ class DepthView : View {
                     buyFillPath.moveTo(
                         buyList[i].x
                         ,
-                        (mHeight - mBottomPriceHeight)
+                        (mHeight  - mBottomPriceHeight)
                     )
                     buyFillPath.lineTo(
                         buyList[i].x,
@@ -437,7 +438,7 @@ class DepthView : View {
                         buyList[i].y
                     )
 
-                    buyFillPath.lineTo(buyList[i].x, (mHeight - mBottomPriceHeight))
+                    buyFillPath.lineTo(buyList[i].x, mHeight  - mBottomPriceHeight)
                     buyFillPath.close()
 
                     canvas.drawPath(buyFillPath, buyFillPaint)
@@ -472,10 +473,7 @@ class DepthView : View {
                         sellList[i].y
                     )
 
-//                    sellFillPath.lineTo(
-//                        sellList[i].x,
-//                        (mHeight - mBottomPriceHeight - 0.5f)
-//                    )
+                    sellFillPath.moveTo(sellList[i].x, mHeight  - mBottomPriceHeight)
                     sellFillPath.lineTo(
                         sellList[i].x,
                         sellList[i].y
@@ -493,7 +491,7 @@ class DepthView : View {
                         sellList[i].x,
                         sellList[i].y
                     )
-                    sellFillPath.lineTo(sellList[i].x, (mHeight - mBottomPriceHeight).toFloat())
+                    sellFillPath.lineTo(sellList[i].x, mHeight  - mBottomPriceHeight)
                     sellFillPath.close()
 
                     canvas.drawPath(sellFillPath, sellFillPaint)

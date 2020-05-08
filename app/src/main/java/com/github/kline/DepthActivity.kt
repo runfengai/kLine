@@ -26,8 +26,8 @@ class DepthActivity : AppCompatActivity() {
         setContentView(R.layout.activity_depth)
         depthView = findViewById(R.id.depthView)
         thirdView = findViewById(R.id.thirdView)
-//        fetchData0()
-        fetchData()
+        fetchData0()
+//        fetchData()
     }
 
     /**
@@ -35,6 +35,7 @@ class DepthActivity : AppCompatActivity() {
      */
     private fun fetchData0() {
         val buyList = mutableListOf<DepthEntity>()
+        val buyOrders = mutableListOf<OrdersItem>()
         val size = 20
         for (i in 0..size) {
             val item = DepthEntity()
@@ -44,8 +45,10 @@ class DepthActivity : AppCompatActivity() {
                 item.amount = 1f
             }
             buyList.add(item)
+            buyOrders.add(OrdersItem(item.amount, item.price))
         }
         val sellList = mutableListOf<DepthEntity>()
+        val sellOrders = mutableListOf<OrdersItem>()
         for (i in size..size * 2) {
             val item = DepthEntity()
             item.price = i * 1 + 0.65f
@@ -54,9 +57,11 @@ class DepthActivity : AppCompatActivity() {
                 item.amount = 2f
             }
             sellList.add(item)
+            sellOrders.add(OrdersItem(item.amount, item.price))
         }
 
         depthView.setData(buyList, sellList)
+        thridViewShow(buyOrders, sellOrders)
     }
 
 
@@ -105,17 +110,24 @@ class DepthActivity : AppCompatActivity() {
 
             depthView.setData(res.buyOrders.toList(), res.sellOrders.toList())
 
-            val buyList = mutableListOf<Depth>()
-            res.buyOrders.forEach {
-                buyList.add(Depth(it.price.toDouble(), it.amount.toDouble(), 0))
-            }
-            val sellList = mutableListOf<Depth>()
-            res.sellOrders.forEach {
-                sellList.add(Depth(it.price.toDouble(), it.amount.toDouble(), 1))
-            }
-
-            thirdView.resetAllData(buyList, sellList)
+            thridViewShow(res.buyOrders, res.sellOrders)
 
         }
+    }
+
+    private fun thridViewShow(
+        buyOrders: MutableList<OrdersItem>,
+        sellOrders: MutableList<OrdersItem>
+    ) {
+        val buyList = mutableListOf<Depth>()
+        buyOrders.forEach {
+            buyList.add(Depth(it.price.toDouble(), it.amount.toDouble(), 0))
+        }
+        val sellList = mutableListOf<Depth>()
+        sellOrders.forEach {
+            sellList.add(Depth(it.price.toDouble(), it.amount.toDouble(), 1))
+        }
+
+        thirdView.resetAllData(buyList, sellList)
     }
 }
