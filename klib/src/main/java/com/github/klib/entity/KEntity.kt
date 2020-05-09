@@ -1,6 +1,8 @@
 package com.github.klib.entity
 
 import java.util.*
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * 对外暴露
@@ -54,4 +56,55 @@ open class KEntity(
 
     var wr:Float=0f//
 
-)
+){
+
+    //融5分钟等线
+    var list = ArrayList<KEntity>()
+
+    fun addChild(newData: KEntity) {
+        if (list.isEmpty()) {
+            if (newData.dateTime != this.dateTime) {
+                val self = KEntity()
+                self.volume = this.volume
+                self.dateTime = this.dateTime
+                self.close = this.close
+                self.lowest = this.lowest
+                self.highest = this.highest
+                list.add(self)
+            }
+            list.add(newData)
+        } else {
+            if (list[list.size - 1].dateTime == newData.dateTime) {//修正数据
+                //替换数据
+                list[list.size - 1] = newData
+            } else {//新增数据
+                list.add(newData)
+            }
+        }
+    }
+
+
+    fun getExtraVolume(): Float {
+        var f = 0f
+        list.forEach {
+            f += it.volume
+        }
+        return f
+    }
+
+    fun getExtraLow(): Float {
+        var low = Float.MAX_VALUE
+        list.forEach {
+            low = min(low, it.lowest)
+        }
+        return low
+    }
+
+    fun getExtraHigh(): Float {
+        var high = Float.MIN_VALUE
+        list.forEach {
+            high = max(high, it.lowest)
+        }
+        return high
+    }
+}

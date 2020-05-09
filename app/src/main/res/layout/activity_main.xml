@@ -70,8 +70,16 @@
                 android:layout_height="38dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="10dp"
-                android:text="深度图"
-                android:onClick="toDepth"/>
+                android:onClick="toDepth"
+                android:text="深度图" />
+
+            <Button
+                android:layout_width="60dp"
+                android:layout_height="38dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="10dp"
+                android:onClick="switchScreen"
+                android:text="切换横屏" />
         </LinearLayout>
 
         <HorizontalScrollView

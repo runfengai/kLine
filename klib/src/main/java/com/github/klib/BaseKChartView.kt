@@ -292,9 +292,9 @@ abstract class BaseKChartView : ScaleScrollView {
 //            mTranslateX -= width / 5
 //        }
     }
-
+    //考虑右侧不能被price遮挡
     private fun isFullScreen(): Boolean {
-        return mDataLen != 0f && mDataLen >= mWidth / mScaleX - mWidth / 5//固定的
+        return mDataLen != 0f && mDataLen >= mWidth / mScaleX - mWidth / (if (klineAttribute.gridColumns < 5) 5 else klineAttribute.gridColumns)//固定的
     }
 
     /**
@@ -391,12 +391,12 @@ abstract class BaseKChartView : ScaleScrollView {
     fun setSubView(type: Int) {
         this.subType = type
         //索引设置成1开始
-        if (type != TYPE_NULL_SUB && type <= mSubViews.size) {
+        if (type != TYPE_NULL_SUB && type >= 1 && type <= mSubViews.size) {
             this.mCurrSubView = mSubViews[type - 1]
         }
     }
 
-    fun setMainView(mainType: Int) {
+    protected fun setMainView(mainType: Int) {
         this.mainType = mainType
         this.mMainView = when (mainType) {
             TYPE_MAIN_TIME_LINE -> {

@@ -1,8 +1,9 @@
 package com.github.kline
 
+import com.github.klib.entity.DataHelper
 import com.github.klib.entity.KEntity
 import com.github.klib.interfaces.BaseKChartAdapter
-import com.github.kline.entity.DataHelper
+
 
 class KAdapter : BaseKChartAdapter<KEntity> {
     private var list = mutableListOf<KEntity>()

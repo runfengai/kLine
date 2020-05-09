@@ -1,6 +1,8 @@
 package com.github.kline
 
 import android.content.Intent
+import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import android.widget.CheckBox
@@ -10,6 +12,7 @@ import com.github.klib.KChartView
 import com.github.klib.KlineConfig
 import com.github.klib.entity.DefValueFormatter
 import com.github.klib.entity.KEntity
+import com.github.klib.util.DensityUtil
 import com.github.kline.GlobalConstant.TAG_AN_HOUR
 import com.github.kline.entity.KData
 import com.github.kline.entity.ResponseEntity
@@ -57,6 +60,44 @@ class MainActivity : AppCompatActivity() {
 
         //设置精度
         kChartView?.setValueFormatter(DefValueFormatter(4))
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+//        重新初始化
+        val lp = kChartView?.layoutParams ?: return
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            lp.height = DensityUtil.dip2px(this, 300f)
+        } else {
+            lp.height = DensityUtil.dip2px(this, 500f)
+        }
+        kChartView?.notifyChanged()
+    }
+
+    override fun onBackPressed() {
+        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            this.apply {
+                finish()
+            }
+        } else {
+            switchScreen()
+//            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+        }
+    }
+
+    /**
+     *
+     */
+    fun switchScreen(v: View) {
+        switchScreen()
+    }
+
+    private fun switchScreen() {
+        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        } else {
+            this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
     }
 
 

@@ -291,9 +291,20 @@ class KChartView : BaseKChartView {
     }
 
     /**
+     * 是否显示主图的ma/ boll
+     */
+    var showMainMa = true//默认显示ma
+    var showMainBoll = false
+    /**
      * 主图是否显示ma和boll线
      */
     fun showMaAndBoll(showMa: Boolean? = null, showBoll: Boolean? = null) {
+        showMa?.apply {
+            showMainMa = this
+        }
+        showBoll?.apply {
+            showMainBoll = this
+        }
         if (mMainView is MainView) {
             (mMainView as MainView).showMaAndBoll(showMa, showBoll)
         }
@@ -307,10 +318,12 @@ class KChartView : BaseKChartView {
 
     /**
      * 设置主图类型：默认蜡烛图，可选分时图
-     * ref {@link KlineConfig}
+     * ref {@link KlineConfig.TYPE_MAIN_TIME_LINE  KlineConfig.TYPE_MAIN_CANDLE}
      */
     fun setMainType(mainType: Int) {
         setMainView(mainType)
+        //主图的指标线状态统一
+        (mMainCandleView as MainView).showMaAndBoll(showMainMa, showMainBoll)
         getAdapter()?.let {
             if (it.getCount() > 0) {
                 notifyChanged()

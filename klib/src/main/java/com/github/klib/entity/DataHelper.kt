@@ -1,4 +1,4 @@
-package com.github.kline.entity
+package com.github.klib.entity
 
 
 import com.github.klib.entity.KEntity
