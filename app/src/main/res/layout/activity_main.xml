@@ -79,7 +79,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="10dp"
                 android:onClick="switchScreen"
-                android:text="切换横屏" />
+                android:text="切屏" />
         </LinearLayout>
 
         <HorizontalScrollView

@@ -39,10 +39,10 @@ class DepthActivity : AppCompatActivity() {
         val size = 20
         for (i in 0..size) {
             val item = DepthEntity()
-            item.price = i * 1 + 0.55f
-            item.amount = 100 * Random.nextFloat()
+            item.price = i * 1 + 0.55
+            item.amount = 100 * Random.nextDouble()
             if (i == size) {
-                item.amount = 1f
+                item.amount = 1.0
             }
             buyList.add(item)
             buyOrders.add(OrdersItem(item.amount, item.price))
@@ -51,10 +51,10 @@ class DepthActivity : AppCompatActivity() {
         val sellOrders = mutableListOf<OrdersItem>()
         for (i in size..size * 2) {
             val item = DepthEntity()
-            item.price = i * 1 + 0.65f
-            item.amount = 100 * Random.nextFloat()
+            item.price = i * 1 + 0.65
+            item.amount = 100 * Random.nextDouble()
             if (i == size) {
-                item.amount = 2f
+                item.amount = 2.0
             }
             sellList.add(item)
             sellOrders.add(OrdersItem(item.amount, item.price))
@@ -88,13 +88,13 @@ class DepthActivity : AppCompatActivity() {
                 val buyOrders = mutableListOf<OrdersItem>()
                 bData.buyOrders?.forEach {
                     if (it.isNotEmpty() && it.size == 2) {
-                        buyOrders.add(OrdersItem(it[1].toFloat(), it[0].toFloat()))
+                        buyOrders.add(OrdersItem(it[1], it[0]))
                     }
                 }
                 val sellOrders = mutableListOf<OrdersItem>()
                 bData.sellOrders?.forEach {
                     if (it.isNotEmpty() && it.size == 2) {
-                        sellOrders.add(OrdersItem(it[1].toFloat(), it[0].toFloat()))
+                        sellOrders.add(OrdersItem(it[1], it[0]))
                     }
                 }
                 SocketSnapShot(
@@ -121,11 +121,11 @@ class DepthActivity : AppCompatActivity() {
     ) {
         val buyList = mutableListOf<Depth>()
         buyOrders.forEach {
-            buyList.add(Depth(it.price.toDouble(), it.amount.toDouble(), 0))
+            buyList.add(Depth(it.price, it.amount, 0))
         }
         val sellList = mutableListOf<Depth>()
         sellOrders.forEach {
-            sellList.add(Depth(it.price.toDouble(), it.amount.toDouble(), 1))
+            sellList.add(Depth(it.price, it.amount, 1))
         }
 
         thirdView.resetAllData(buyList, sellList)

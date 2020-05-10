@@ -20,12 +20,12 @@ data class BookItem(
 
 class OrdersItem : DepthEntity {
     constructor()
-    constructor(volume: Float, price: Float) {
+    constructor(volume: Double, price: Double) {
         this.price = price
         this.amount = volume
     }
 
-    constructor(volume: Float = 0f, price: Float = 0f, nullTag: Boolean = false) {
+    constructor(volume: Double = 0.0, price: Double = 0.0, nullTag: Boolean = false) {
         this.price = price
         this.amount = volume
         this.nullTag = nullTag
