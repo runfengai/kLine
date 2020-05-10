@@ -15,11 +15,3 @@ k线图支持如下：
 鸣谢：https://github.com/tifezh/KChartView
 
 
-
-
-
-
-
-
-
-鸣谢：
