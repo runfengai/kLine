@@ -1,5 +1,7 @@
 package com.github.klib.entity
 
+import android.os.Parcelable
+import java.io.Serializable
 import java.util.*
 import kotlin.math.max
 import kotlin.math.min
@@ -54,10 +56,9 @@ open class KEntity(
     var rsi2: Float = 0f,
     var rsi3: Float = 0f,//rsi指标
 
-    var wr:Float=0f//
+    var wr: Float = 0f//
 
-){
-
+) : Serializable {
     //融5分钟等线
     var list = ArrayList<KEntity>()
 

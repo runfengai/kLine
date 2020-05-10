@@ -1,16 +1,17 @@
 package com.github.klib.interfaces
 
 import android.graphics.Canvas
+import com.github.klib.BaseKChartView
 import com.github.klib.entity.DefValueFormatter
 
 /**
  *
  */
-interface IChartDraw<T> {
+abstract class IChartDraw<T>(private val baseKChartView: BaseKChartView) {
     /**
      *滑动时绘制
      */
-    fun drawTranslated(
+    abstract fun drawTranslated(
         lastPoint: T,
         currPoint: T,
         lastX: Float,
@@ -22,17 +23,17 @@ interface IChartDraw<T> {
     /**
      * 绘制文字
      */
-    fun drawText(canvas: Canvas, position: Int, x: Float, y: Float)
+    abstract fun drawText(canvas: Canvas, position: Int, x: Float, y: Float)
 
 
-    fun getMaxValue(point: T): Float
+    abstract fun getMaxValue(point: T): Float
 
-    fun getMinValue(point: T): Float
+    abstract fun getMinValue(point: T): Float
 
-    fun getValueFormatter(): IValueFormatter{
-        return DefValueFormatter()
+   open fun getValueFormatter(): IValueFormatter {
+        return baseKChartView.mValueFormatter
     }
 
-    fun setAttr()
+    abstract fun setAttr()
 
 }

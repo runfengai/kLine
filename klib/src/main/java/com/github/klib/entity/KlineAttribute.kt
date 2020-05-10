@@ -1,5 +1,7 @@
 package com.github.klib.entity
 
+import java.io.Serializable
+
 /**
  * 自定义属性封装
  */
@@ -51,4 +53,4 @@ data class KlineAttribute(
     var timeLineColor: Int = 0, //分时线颜色
     var timeLineShaderColorTop: Int = 0, //分时线颜色
     var timeLineShaderColorBtm: Int = 0 //分时线颜色
-)
+) : Serializable

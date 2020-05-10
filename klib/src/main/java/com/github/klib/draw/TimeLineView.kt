@@ -9,7 +9,7 @@ import com.github.klib.interfaces.IChartDraw
 import com.github.klib.util.DensityUtil
 import kotlin.math.max
 
-class TimeLineView(private val baseKChartView: BaseKChartView) : IChartDraw<KEntity> {
+class TimeLineView(private val baseKChartView: BaseKChartView) : IChartDraw<KEntity>(baseKChartView) {
     //顶部折线画笔
     private val timeLinePaint = Paint()
     //阴影区域画笔

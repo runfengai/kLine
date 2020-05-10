@@ -12,8 +12,17 @@ open class DepthEntity : Comparable<DepthEntity> {
         }
     }
 
-    var price: Float = 0f
-    var amount: Float = 0f
+    constructor() {
+
+    }
+
+    constructor(price: Double, amount: Double) {
+        this.price = price
+        this.amount = amount
+    }
+
+    var price: Double = 0.0
+    var amount: Double = 0.0
     var x: Float = 0f
     var y: Float = 0f
 }

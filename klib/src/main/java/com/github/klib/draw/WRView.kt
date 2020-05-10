@@ -6,7 +6,7 @@ import com.github.klib.BaseKChartView
 import com.github.klib.entity.KEntity
 import com.github.klib.interfaces.IChartDraw
 
-class WRView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity> {
+class WRView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity>(baseKChartView) {
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     override fun setAttr() {

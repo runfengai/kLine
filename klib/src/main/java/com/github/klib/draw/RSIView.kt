@@ -3,21 +3,20 @@ package com.github.klib.draw
 import android.graphics.Canvas
 import android.graphics.Paint
 import com.github.klib.BaseKChartView
-import com.github.klib.entity.DefValueFormatter
 import com.github.klib.entity.KEntity
 import com.github.klib.interfaces.IChartDraw
-import com.github.klib.interfaces.IValueFormatter
 import kotlin.math.max
 import kotlin.math.min
 
-class RSIView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntity> {
+class RSIView(private var baseKChartView: BaseKChartView) :
+    IChartDraw<KEntity>(baseKChartView) {
 
     private val rsi1Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val rsi2Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val rsi3Paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     override fun setAttr() {
-        baseKchartView.klineAttribute.apply {
+        baseKChartView.klineAttribute.apply {
             rsi1Paint.color = rsi1Color
             rsi2Paint.color = rsi2Color
             rsi3Paint.color = rsi3Color
@@ -42,29 +41,29 @@ class RSIView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntity> 
     ) {
         canvas.drawLine(
             lastX,
-            baseKchartView.getSubY(lastPoint.rsi1),
+            baseKChartView.getSubY(lastPoint.rsi1),
             currX,
-            baseKchartView.getSubY(currPoint.rsi1),
+            baseKChartView.getSubY(currPoint.rsi1),
             rsi1Paint
         )
         canvas.drawLine(
             lastX,
-            baseKchartView.getSubY(lastPoint.rsi2),
+            baseKChartView.getSubY(lastPoint.rsi2),
             currX,
-            baseKchartView.getSubY(currPoint.rsi2),
+            baseKChartView.getSubY(currPoint.rsi2),
             rsi2Paint
         )
         canvas.drawLine(
             lastX,
-            baseKchartView.getSubY(lastPoint.rsi3),
+            baseKChartView.getSubY(lastPoint.rsi3),
             currX,
-            baseKchartView.getSubY(currPoint.rsi3),
+            baseKChartView.getSubY(currPoint.rsi3),
             rsi3Paint
         )
     }
 
     override fun drawText(canvas: Canvas, position: Int, x: Float, y: Float) {
-        val item = baseKchartView.getItem(position) ?: return
+        val item = baseKChartView.getItem(position) ?: return
         var x0 = x
         var text = "RSI(1):${getValueFormatter().format(item.rsi1)}   "
         canvas.drawText(text, x0, y, rsi1Paint)

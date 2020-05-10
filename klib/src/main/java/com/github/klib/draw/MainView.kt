@@ -15,7 +15,7 @@ import kotlin.math.min
 /**
  * 主图
  */
-class MainView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity> {
+class MainView(private var baseKChartView: BaseKChartView) : IChartDraw<KEntity>(baseKChartView) {
 
     override fun setAttr() {
         baseKChartView.klineAttribute.apply {

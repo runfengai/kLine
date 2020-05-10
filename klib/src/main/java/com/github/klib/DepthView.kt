@@ -13,6 +13,8 @@ import android.view.View
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.core.content.ContextCompat
+import com.github.klib.entity.BigValueFormatter
+import com.github.klib.entity.DefValueFormatter
 import com.github.klib.entity.DepthEntity
 import com.github.klib.util.DensityUtil
 import kotlin.math.abs
@@ -20,7 +22,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 /**
- * 深度图,弃用
+ * 深度图
  */
 class DepthView : View {
 
@@ -42,17 +44,17 @@ class DepthView : View {
      * 计算的各种指标
      *
      */
-    private var buyPriceMin = 0f
-    private var buyPriceMax = 0f
-    private var sellPriceMin = 0f
-    private var sellPriceMax = 0f
+    private var buyPriceMin = 0.0
+    private var buyPriceMax = 0.0
+    private var sellPriceMin = 0.0
+    private var sellPriceMax = 0.0
 
-    private var priceMiddle = 0f
+    private var priceMiddle = 0.0
 
-    private var buyVolumeMin = 0f
-    private var buyVolumeMax = 0f
-    private var sellVolumeMin = 0f
-    private var sellVolumeMax = 0f
+    private var buyVolumeMin = 0.0
+    private var buyVolumeMax = 0.0
+    private var sellVolumeMin = 0.0
+    private var sellVolumeMax = 0.0
 
 
     private var buyColor: Int = 0
@@ -175,31 +177,35 @@ class DepthView : View {
     }
 
 
-    fun setData(buyList: List<DepthEntity>, sellList: List<DepthEntity>) {
-        setBuyList(buyList)
-        setSellList(sellList)
-
+    /**
+     * 数据量如果过大，可以在子线程中处理完，再直接过来渲染数据
+     * @param needSort 是否需要重新排序：如果外部已经按照price排好序了，传false
+     */
+    fun setData(buyList: List<DepthEntity>, sellList: List<DepthEntity>, needSort: Boolean = true) {
+        setBuyList(buyList, needSort)
+        setSellList(sellList, needSort)
         requestLayout()
     }
 
-    private fun setSellList(sellList: List<DepthEntity>) {
+
+    private fun setSellList(sellList: List<DepthEntity>, needSort: Boolean = true) {
         this.sellList.clear()
-        this.sellList.addAll(sellList.sorted())
+        this.sellList.addAll(if (needSort) sellList.sorted() else sellList)
     }
 
-    private fun setBuyList(buyList: List<DepthEntity>) {
+    private fun setBuyList(buyList: List<DepthEntity>, needSort: Boolean = true) {
         this.buyList.clear()
-        this.buyList.addAll(buyList.sorted())
+        this.buyList.addAll(if (needSort) buyList.sorted() else buyList)
     }
 
     /**
      * 各种计算
      */
     private fun calculate() {
-        buyPriceMin = Float.MAX_VALUE
-        buyPriceMax = Float.MIN_VALUE
-        sellPriceMin = Float.MAX_VALUE
-        sellPriceMax = Float.MIN_VALUE
+        buyPriceMin = Double.MAX_VALUE
+        buyPriceMax = Double.MIN_VALUE
+        sellPriceMin = Double.MAX_VALUE
+        sellPriceMax = Double.MIN_VALUE
         for (i in buyList.size - 1 downTo 0) {
             buyPriceMin = min(buyPriceMin, buyList[i].price)
             buyPriceMax = max(buyPriceMax, buyList[i].price)
@@ -231,23 +237,25 @@ class DepthView : View {
 
         //计算volume
         val drawHeight = mHeight - mTopWidth - mBottomPriceHeight
-        volumeSpace = drawHeight / this.gridRows
+        volumeSpace = drawHeight.toDouble() / this.gridRows
         volumeMax = max(buyVolumeMax, sellVolumeMax)
         val volumeMin = min(buyVolumeMin, sellVolumeMin)
         volumeItem = volumeMax / this.gridRows //固定的
         //每一单位volume对应的高度
         val avgHeightPerVolume = drawHeight / (volumeMax - volumeMin)
-        val avgWidthPreSize = mWidth.toFloat() / (buyList.size + sellList.size)
+        val avgWidthPreSize = mWidth / (buyList.size + sellList.size)
 
         //计算x,y坐标并赋值
         for (i in 0 until buyList.size) {
             buyList[i].x = avgWidthPreSize * i
-            buyList[i].y = mTopWidth + (volumeMax - buyList[i].amount) * avgHeightPerVolume
+            buyList[i].y =
+                (mTopWidth + (volumeMax - buyList[i].amount) * avgHeightPerVolume).toFloat()
         }
         //计算x,y坐标并赋值
         for (i in 0 until sellList.size) {
             sellList[i].x = mWidth - (sellList.size - 1 - i) * avgWidthPreSize
-            sellList[i].y = mTopWidth + (volumeMax - sellList[i].amount) * avgHeightPerVolume
+            sellList[i].y =
+                (mTopWidth + (volumeMax - sellList[i].amount) * avgHeightPerVolume).toFloat()
         }
 
     }
@@ -257,7 +265,8 @@ class DepthView : View {
     /**
      * 精度
      */
-    var scale = 2
+    var priceScale = 2
+    var volumeScale = 2
     /**
      * 顶部，需要留出位置显示买卖方向
      */
@@ -271,7 +280,7 @@ class DepthView : View {
         super.onSizeChanged(w, h, oldw, oldh)
         mWidth = w.toFloat()
         mHeight = h.toFloat()
-        calculate()
+
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
@@ -280,13 +289,13 @@ class DepthView : View {
         topStart = (paddingTop + 1).toFloat()
         rightEnd = (measuredWidth - paddingRight - 1).toFloat()
         bottomEnd = (measuredHeight - paddingBottom - 1).toFloat()
-
-
+        calculate()
     }
 
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas ?: return)
+        if (buyList.size == 0 && sellList.size == 0) return
         drawGrid(canvas)
         drawValue(canvas)
         drawTop(canvas)
@@ -299,10 +308,10 @@ class DepthView : View {
     var showLeft = true
     var showRight = false
     //volume最大值
-    private var volumeMax: Float = 0f
+    private var volumeMax = 0.0
     //显示用的
-    private var volumeItem: Float = 0f
-    private var volumeSpace: Float = 0f
+    private var volumeItem = 0.0
+    private var volumeSpace = 0.0
 
 
     /**
@@ -314,18 +323,18 @@ class DepthView : View {
         for (i in this.gridRows downTo 1) {
             if (showLeft) {
                 canvas.drawText(
-                    getFormatValue(volumeMax - (i - 1) * volumeItem),
+                    getVolumeFormatValue((volumeMax - (i - 1) * volumeItem).toFloat()),
                     topTextPadding.toFloat(),
-                    mTopWidth + volumeSpace * (i - 1),
+                    (mTopWidth + volumeSpace * (i - 1)).toFloat(),
                     textPaint
                 )
             }
             if (showRight) {
-                val text = getFormatValue(volumeMax - (i - 1) * volumeItem)
+                val text = getVolumeFormatValue((volumeMax - (i - 1) * volumeItem).toFloat())
                 canvas.drawText(
                     text,
                     mWidth - textPaint.measureText(text) - topTextPadding.toFloat(),
-                    mTopWidth + volumeSpace * (i - 1),
+                    (mTopWidth + volumeSpace * (i - 1)).toFloat(),
                     textPaint
                 )
             }
@@ -334,19 +343,19 @@ class DepthView : View {
         val metrics = textPaint.fontMetrics
         val textH = metrics.descent - metrics.ascent
         canvas.drawText(
-            getFormatValue(buyPriceMin),
+            getPriceFormatValue(buyPriceMin.toFloat()),
             topTextPadding.toFloat(),
             mHeight - mBottomPriceHeight + textH,
             textPaint
         )
-        val middleText = getFormatValue(priceMiddle)
+        val middleText = getPriceFormatValue(priceMiddle.toFloat())
         canvas.drawText(
             middleText,
             mWidth / 2 - textPaint.measureText(middleText) / 2,
             mHeight - mBottomPriceHeight + textH,
             textPaint
         )
-        val endText = getFormatValue(sellPriceMax)
+        val endText = getPriceFormatValue(sellPriceMax.toFloat())
         canvas.drawText(
             endText,
             mWidth - textPaint.measureText(endText) - topTextPadding.toFloat(),
@@ -432,6 +441,10 @@ class DepthView : View {
                         buyList[i].x,
                         buyList[i].y
                     )
+                    buyPath.lineTo(
+                        buyList[i].x,
+                        mHeight - mBottomPriceHeight
+                    )
 
                     buyFillPath.lineTo(
                         buyList[i].x,
@@ -469,6 +482,10 @@ class DepthView : View {
             when (i) {
                 0 -> {
                     sellPath.moveTo(
+                        sellList[i].x,
+                        mHeight - mBottomPriceHeight
+                    )
+                    sellPath.lineTo(
                         sellList[i].x,
                         sellList[i].y
                     )
@@ -528,8 +545,8 @@ class DepthView : View {
     private fun drawGrid(canvas: Canvas) {
         if (this.gridRows > 0) {
             //        主图
-            val widthF = mWidth.toFloat()
-            val heightF = mHeight.toFloat()
+            val widthF = mWidth
+            val heightF = mHeight
             rowSpace =
                 (heightF - mTopWidth - mBottomPriceHeight) / this.gridRows
 
@@ -576,9 +593,10 @@ class DepthView : View {
         getTopLineYByX(startX)
         invalidate()
     }
-
+    var enableTouch = false
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (!enableTouch) return super.onTouchEvent(event)
         val ev = event ?: return super.onTouchEvent(event)
         when (ev.action) {
             MotionEvent.ACTION_DOWN -> {
@@ -639,7 +657,14 @@ class DepthView : View {
         if (inTouch or isLongPress) {
             val paint = if (isLeftTouch) buyPaint else sellPaint
             val list = if (isLeftTouch) buyList else sellList
-            canvas.drawCircle(list[touchPositionOfLine].x, list[touchPositionOfLine].y, depthCircleRadius, paint)
+            if (touchPositionOfLine >= 0 && touchPositionOfLine < list.size - 1) {
+                canvas.drawCircle(
+                    list[touchPositionOfLine].x,
+                    list[touchPositionOfLine].y,
+                    depthCircleRadius,
+                    paint
+                )
+            }
         }
     }
 
@@ -691,8 +716,25 @@ class DepthView : View {
     }
 
 
-    fun getFormatValue(f: Float): String {
-        return String.format("%.${scale}f", f)
+    //可自己设置
+    var priceValueFormatter: DefValueFormatter? = null
+    var volumeValueFormatter: BigValueFormatter? = null
+
+    private fun getPriceFormatValue(f: Float): String {
+        if (priceValueFormatter == null) {
+            priceValueFormatter = DefValueFormatter(priceScale)
+        }
+        return priceValueFormatter?.format(f) ?: ""
+    }
+
+    /**
+     * volume不太一样
+     */
+    private fun getVolumeFormatValue(f: Float): String {
+        if (volumeValueFormatter == null) {
+            volumeValueFormatter = BigValueFormatter(context)
+        }
+        return volumeValueFormatter?.format(f) ?: ""
     }
 
 }

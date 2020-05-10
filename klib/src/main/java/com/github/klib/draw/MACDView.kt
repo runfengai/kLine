@@ -8,7 +8,8 @@ import com.github.klib.interfaces.IChartDraw
 import kotlin.math.max
 import kotlin.math.min
 
-class MACDView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntity> {
+class MACDView(private var baseKChartView: BaseKChartView) :
+    IChartDraw<KEntity>(baseKChartView) {
     //macd
     private val downPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val upPaint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -19,7 +20,7 @@ class MACDView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntity>
     private val macdPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var radius: Float = 0f
     override fun setAttr() {
-        baseKchartView.klineAttribute.apply {
+        baseKChartView.klineAttribute.apply {
             radius = lineWidth
             downPaint.color = candleDownColor
             upPaint.color = candleUpColor
@@ -48,16 +49,16 @@ class MACDView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntity>
         drawMACD(currPoint, currX, canvas)
         canvas.drawLine(
             lastX,
-            baseKchartView.getSubY(lastPoint.dif),
+            baseKChartView.getSubY(lastPoint.dif),
             currX,
-            baseKchartView.getSubY(currPoint.dif),
+            baseKChartView.getSubY(currPoint.dif),
             difPaint
         )
         canvas.drawLine(
             lastX,
-            baseKchartView.getSubY(lastPoint.dea),
+            baseKChartView.getSubY(lastPoint.dea),
             currX,
-            baseKchartView.getSubY(currPoint.dea),
+            baseKChartView.getSubY(currPoint.dea),
             deaPaint
         )
     }
@@ -73,16 +74,16 @@ class MACDView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntity>
         }
         canvas.drawRect(
             currX - radius,
-            baseKchartView.getSubY(macd),
+            baseKChartView.getSubY(macd),
             currX + radius,
-            baseKchartView.getSubY(0f),
+            baseKChartView.getSubY(0f),
             paint
         )
 
     }
 
     override fun drawText(canvas: Canvas, position: Int, x: Float, y: Float) {
-        val item = baseKchartView.getItem(position) ?: return
+        val item = baseKChartView.getItem(position) ?: return
         var text = "MACD:${getValueFormatter().format(item.macd)}   "
         var x0 = x
         canvas.drawText(text, x0, y, macdPaint)

@@ -9,6 +9,7 @@ import android.view.ScaleGestureDetector
 import android.widget.OverScroller
 import android.widget.RelativeLayout
 import androidx.core.view.GestureDetectorCompat
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
 abstract class ScaleScrollView : RelativeLayout, GestureDetector.OnGestureListener,
@@ -213,18 +214,59 @@ abstract class ScaleScrollView : RelativeLayout, GestureDetector.OnGestureListen
 
     }
 
+    private var lastX = 0f
+    private var lastY = 0f
+    override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
+        val event = ev ?: return super.dispatchTouchEvent(ev)
+        val x = event.rawX
+        val y = event.rawY
+        when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                lastX = x
+                lastY = y
+            }
+            MotionEvent.ACTION_MOVE -> {
+                val deltaX = abs(x - lastX)
+                val deltaY = abs(y - lastY)
+                if (deltaX > deltaY || isLongPress) {
+                    parent.parent.requestDisallowInterceptTouchEvent(true)
+                    return true
+                } else {
+                    parent.parent.requestDisallowInterceptTouchEvent(false)
+                }
+            }
+            MotionEvent.ACTION_UP -> {
+
+            }
+        }
+        return super.onInterceptTouchEvent(ev)
+    }
+
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         val ev = event ?: return true
         val mask = MotionEvent.ACTION_MASK
+        val x = event.rawX
+        val y = event.rawY
         when (ev.action and mask) {
             MotionEvent.ACTION_DOWN -> {
                 inTouch = true
+                lastX = x
+                lastY = y
             }
             MotionEvent.ACTION_MOVE -> {
                 if (ev.pointerCount == 1) {//单指点击
-                    if (isLongPress) {
-                        onLongPress(ev)
+                    val deltaX = abs(x - lastX)
+                    val deltaY = abs(y - lastY)
+                    if (deltaX > deltaY || isLongPress) {
+                        parent.parent.requestDisallowInterceptTouchEvent(true)
+                        if (isLongPress) {
+                            onLongPress(ev)
+                        }
+                    }else{
+                        parent.parent.requestDisallowInterceptTouchEvent(false)
                     }
+                } else {
+                    parent.parent.requestDisallowInterceptTouchEvent(true)
                 }
             }
             MotionEvent.ACTION_POINTER_UP -> {

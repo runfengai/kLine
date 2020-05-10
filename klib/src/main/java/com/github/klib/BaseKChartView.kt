@@ -292,6 +292,7 @@ abstract class BaseKChartView : ScaleScrollView {
 //            mTranslateX -= width / 5
 //        }
     }
+
     //考虑右侧不能被price遮挡
     private fun isFullScreen(): Boolean {
         return mDataLen != 0f && mDataLen >= mWidth / mScaleX - mWidth / (if (klineAttribute.gridColumns < 5) 5 else klineAttribute.gridColumns)//固定的
@@ -711,12 +712,12 @@ abstract class BaseKChartView : ScaleScrollView {
             else klineAttribute.gridRows - 1, 2
         )
         val betweenItem = (mMainMaxVal - mMainMinVal) / (mainRow - 1)
-        val textWidth = mTextPaint.measureText(formatValue(mMainMaxVal))
         /**
          * ----------画主图数值----------
          */
         for (i in 0 until mainRow) {
             val text = formatValue(mMainMaxVal - i * betweenItem)
+            val textWidth = mTextPaint.measureText(text)
             canvas.drawText(
                 text,
                 mWidth - textWidth - mEndPadding,

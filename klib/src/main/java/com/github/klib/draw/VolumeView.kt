@@ -2,7 +2,6 @@ package com.github.klib.draw
 
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.util.Log
 import com.github.klib.BaseKChartView
 import com.github.klib.entity.BigValueFormatter
 import com.github.klib.entity.KEntity
@@ -11,7 +10,8 @@ import com.github.klib.interfaces.IValueFormatter
 import kotlin.math.max
 import kotlin.math.min
 
-class VolumeView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntity> {
+class VolumeView(private var baseKChartView: BaseKChartView) :
+    IChartDraw<KEntity>(baseKChartView) {
     private val volDownPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val volUpPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val volMa5Paint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -20,7 +20,7 @@ class VolumeView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntit
     private var radius: Float = 0f
 
     override fun setAttr() {
-        baseKchartView.klineAttribute.apply {
+        baseKChartView.klineAttribute.apply {
             volDownPaint.color = candleDownColor
             volUpPaint.color = candleUpColor
             volMa5Paint.color = ma5Color
@@ -49,18 +49,18 @@ class VolumeView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntit
         if (lastPoint.ma5Volume != 0f && position >= 5) {
             canvas.drawLine(
                 lastX,
-                baseKchartView.getVolumeY(lastPoint.ma5Volume),
+                baseKChartView.getVolumeY(lastPoint.ma5Volume),
                 currX,
-                baseKchartView.getVolumeY(currPoint.ma5Volume),
+                baseKChartView.getVolumeY(currPoint.ma5Volume),
                 volMa5Paint
             )
         }
         if (lastPoint.ma10Volume != 0f && position >= 10) {
             canvas.drawLine(
                 lastX,
-                baseKchartView.getVolumeY(lastPoint.ma10Volume),
+                baseKChartView.getVolumeY(lastPoint.ma10Volume),
                 currX,
-                baseKchartView.getVolumeY(currPoint.ma10Volume),
+                baseKChartView.getVolumeY(currPoint.ma10Volume),
                 volMa10Paint
             )
         }
@@ -75,26 +75,26 @@ class VolumeView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntit
         }
         canvas.drawRect(
             currX - radius,
-            baseKchartView.getVolumeY(currPoint.volume),
+            baseKChartView.getVolumeY(currPoint.volume),
             currX + radius,
-            baseKchartView.mVolumeRect.bottom.toFloat(),
+            baseKChartView.mVolumeRect.bottom.toFloat(),
             paint
         )
     }
 
     override fun drawText(canvas: Canvas, position: Int, x: Float, y: Float) {
-        val item = baseKchartView.getItem(position) ?: return
+        val item = baseKChartView.getItem(position) ?: return
         var x0 = x
         var text = "VOL:${getValueFormatter().format(item.volume)}"
-        volTextPaint.color = baseKchartView.klineAttribute.textColor
+        volTextPaint.color = baseKChartView.klineAttribute.textColor
         canvas.drawText(text, x0, y, volTextPaint)
         x0 += volTextPaint.measureText("$text   ")
         text = "MA5:${getValueFormatter().format(item.ma5Volume)}"
-        volTextPaint.color = baseKchartView.klineAttribute.ma5Color
+        volTextPaint.color = baseKChartView.klineAttribute.ma5Color
         canvas.drawText(text, x0, y, volTextPaint)
         x0 += volTextPaint.measureText("$text   ")
         text = "MA10:${getValueFormatter().format(item.ma10Volume)}"
-        volTextPaint.color = baseKchartView.klineAttribute.ma10Color
+        volTextPaint.color = baseKChartView.klineAttribute.ma10Color
         canvas.drawText(text, x0, y, volTextPaint)
     }
 
@@ -107,7 +107,7 @@ class VolumeView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntit
     }
 
     override fun getValueFormatter(): IValueFormatter {
-        return BigValueFormatter(baseKchartView.context)
+        return BigValueFormatter(baseKChartView.context)
     }
 
     init {

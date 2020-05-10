@@ -5,16 +5,16 @@ import android.graphics.Paint
 import com.github.klib.BaseKChartView
 import com.github.klib.entity.KEntity
 import com.github.klib.interfaces.IChartDraw
-import com.github.klib.interfaces.IValueFormatter
 import kotlin.math.max
 import kotlin.math.min
 
-class KDJView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntity> {
+class KDJView(private var baseKChartView: BaseKChartView) :
+    IChartDraw<KEntity>(baseKChartView) {
     private val kPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val dPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val jPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     override fun setAttr() {
-        baseKchartView.klineAttribute.apply {
+        baseKChartView.klineAttribute.apply {
             kPaint.color = kColor
             dPaint.color = dColor
             jPaint.color = jColor
@@ -40,30 +40,30 @@ class KDJView(private var baseKchartView: BaseKChartView) : IChartDraw<KEntity> 
     ) {
         canvas.drawLine(
             lastX,
-            baseKchartView.getSubY(lastPoint.k),
+            baseKChartView.getSubY(lastPoint.k),
             currX,
-            baseKchartView.getSubY(currPoint.k),
+            baseKChartView.getSubY(currPoint.k),
             kPaint
         )
         canvas.drawLine(
             lastX,
-            baseKchartView.getSubY(lastPoint.d),
+            baseKChartView.getSubY(lastPoint.d),
             currX,
-            baseKchartView.getSubY(currPoint.d),
+            baseKChartView.getSubY(currPoint.d),
             dPaint
         )
         canvas.drawLine(
             lastX,
-            baseKchartView.getSubY(lastPoint.j),
+            baseKChartView.getSubY(lastPoint.j),
             currX,
-            baseKchartView.getSubY(currPoint.j),
+            baseKChartView.getSubY(currPoint.j),
             jPaint
         )
 
     }
 
     override fun drawText(canvas: Canvas, position: Int, x: Float, y: Float) {
-        val item = baseKchartView.getItem(position) ?: return
+        val item = baseKChartView.getItem(position) ?: return
         var text = "K:${getValueFormatter().format(item.k)}   "
         var x0 = x
         canvas.drawText(text, x0, y, kPaint)
