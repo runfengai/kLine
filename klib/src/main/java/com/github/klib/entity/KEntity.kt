@@ -29,6 +29,7 @@ open class KEntity(
     var MA5: Float = 0f,//五日（或月、时、分）线均价
     var MA10: Float = 0f,//十日（或月、时、分）线均价
     var MA30: Float = 0f,//三十日（或月、时、分）线均价
+    var MA20: Float = 0f,//二十日（或月、时、分）线均价
     /**
      * KDJ指标
      */

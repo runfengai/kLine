@@ -46,21 +46,30 @@ class MACDView(private var baseKChartView: BaseKChartView) :
         canvas: Canvas,
         position: Int
     ) {
-        drawMACD(currPoint, currX, canvas)
-        canvas.drawLine(
-            lastX,
-            baseKChartView.getSubY(lastPoint.dif),
-            currX,
-            baseKChartView.getSubY(currPoint.dif),
-            difPaint
-        )
-        canvas.drawLine(
-            lastX,
-            baseKChartView.getSubY(lastPoint.dea),
-            currX,
-            baseKChartView.getSubY(currPoint.dea),
-            deaPaint
-        )
+        if (position >= 26) {
+            canvas.drawLine(
+                lastX,
+                baseKChartView.getSubY(lastPoint.dif),
+                currX,
+                baseKChartView.getSubY(currPoint.dif),
+                difPaint
+            )
+            if (position >= 34) {
+                if (position == 34) {
+                    drawMACD(lastPoint, lastX, canvas)
+                }
+                drawMACD(currPoint, currX, canvas)
+
+                canvas.drawLine(
+                    lastX,
+                    baseKChartView.getSubY(lastPoint.dea),
+                    currX,
+                    baseKChartView.getSubY(currPoint.dea),
+                    deaPaint
+                )
+            }
+        }
+
     }
 
 

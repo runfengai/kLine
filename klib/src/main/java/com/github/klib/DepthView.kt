@@ -24,6 +24,7 @@ import kotlin.math.min
 /**
  * 深度图
  */
+@Suppress("SENSELESS_COMPARISON", "UselessCallOnCollection")
 class DepthView : View {
 
 
@@ -190,12 +191,12 @@ class DepthView : View {
 
     private fun setSellList(sellList: List<DepthEntity>, needSort: Boolean = true) {
         this.sellList.clear()
-        this.sellList.addAll(if (needSort) sellList.sorted() else sellList)
+        this.sellList.addAll(if (needSort) sellList.filterNotNull().sorted() else sellList.filterNotNull())
     }
 
     private fun setBuyList(buyList: List<DepthEntity>, needSort: Boolean = true) {
         this.buyList.clear()
-        this.buyList.addAll(if (needSort) buyList.sorted() else buyList)
+        this.buyList.addAll(if (needSort) buyList.filterNotNull().sorted() else buyList.filterNotNull())
     }
 
     /**
@@ -207,6 +208,7 @@ class DepthView : View {
         sellPriceMin = Double.MAX_VALUE
         sellPriceMax = Double.MIN_VALUE
         for (i in buyList.size - 1 downTo 0) {
+            if (buyList[i] == null) continue
             buyPriceMin = min(buyPriceMin, buyList[i].price)
             buyPriceMax = max(buyPriceMax, buyList[i].price)
             if (i < buyList.size - 1) {
@@ -220,6 +222,7 @@ class DepthView : View {
         }
 
         for (i in 0 until sellList.size) {
+            if (sellList[i] == null) continue
             sellPriceMin = min(sellPriceMin, sellList[i].price)
             sellPriceMax = max(sellPriceMax, sellList[i].price)
             if (i > 0) {
@@ -247,12 +250,14 @@ class DepthView : View {
 
         //计算x,y坐标并赋值
         for (i in 0 until buyList.size) {
+            if (buyList[i] == null) continue
             buyList[i].x = avgWidthPreSize * i
             buyList[i].y =
                 (mTopWidth + (volumeMax - buyList[i].amount) * avgHeightPerVolume).toFloat()
         }
         //计算x,y坐标并赋值
         for (i in 0 until sellList.size) {
+            if (sellList[i] == null) continue
             sellList[i].x = mWidth - (sellList.size - 1 - i) * avgWidthPreSize
             sellList[i].y =
                 (mTopWidth + (volumeMax - sellList[i].amount) * avgHeightPerVolume).toFloat()
