@@ -9,7 +9,8 @@ import com.github.klib.interfaces.IChartDraw
 import com.github.klib.util.DensityUtil
 import kotlin.math.max
 
-class TimeLineView(private val baseKChartView: BaseKChartView) : IChartDraw<KEntity>(baseKChartView) {
+class TimeLineView(private val baseKChartView: BaseKChartView) :
+    IChartDraw<KEntity>(baseKChartView) {
     //顶部折线画笔
     private val timeLinePaint = Paint()
     //阴影区域画笔
@@ -39,19 +40,22 @@ class TimeLineView(private val baseKChartView: BaseKChartView) : IChartDraw<KEnt
         }
     }
 
-    override fun drawTranslated(
-        lastPoint: KEntity,
+    override fun drawCubic(
+        prePreviousPosition: Int,
+        prePreviousPoint: KEntity,
+        previousPosition: Int,
+        previousPoint: KEntity,
+        currPosition: Int,
         currPoint: KEntity,
-        lastX: Float,
+        nextPosition: Int,
+        nextPoint: KEntity,
         currX: Float,
-        canvas: Canvas,
-        position: Int
+        canvas: Canvas
     ) {
         val currY = baseKChartView.getMainY(currPoint.close)
         val mainRectBtm = baseKChartView.mMainRect.bottom.toFloat()
 
-
-        when (position) {
+        when (currPosition) {
             baseKChartView.mStartIndex -> {
                 shaderPaint.shader = LinearGradient(
                     0f, baseKChartView.mMainRect.top.toFloat(),
@@ -83,11 +87,60 @@ class TimeLineView(private val baseKChartView: BaseKChartView) : IChartDraw<KEnt
                 shaderPath.reset()
             }
             else -> {
-                timeLinePath.lineTo(currX, currY)
+//                timeLinePath.lineTo(currX, currY)
+//                shaderPath.lineTo(currX, currY)
 
-                shaderPath.lineTo(currX, currY)
+                val prePreX = baseKChartView.getXByIndex(prePreviousPosition)
+                val preX = baseKChartView.getXByIndex(previousPosition)
+                val nextX = baseKChartView.getXByIndex(nextPosition)
+
+                val prePreY = baseKChartView.getMainY(prePreviousPoint.close)
+                val preY = baseKChartView.getMainY(previousPoint.close)
+                val nextY = baseKChartView.getMainY(nextPoint.close)
+
+
+                val firstDiffX = currX - prePreX
+                val firstDiffY = currY - prePreY
+                val secondDiffX = nextX - preX
+                val secondDiffY = nextY - preY
+                val firstControlX =
+                    preX + baseKChartView.klineAttribute.besselIndicator * firstDiffX
+                val firstControlY =
+                    preY + baseKChartView.klineAttribute.besselIndicator * firstDiffY
+
+                val secondControlX =
+                    currX - baseKChartView.klineAttribute.besselIndicator * secondDiffX
+                val secondControlY =
+                    currY - baseKChartView.klineAttribute.besselIndicator * secondDiffY
+                timeLinePath.cubicTo(
+                    firstControlX,
+                    firstControlY,
+                    secondControlX,
+                    secondControlY,
+                    currX,
+                    currY
+                )
+                shaderPath.cubicTo(
+                    firstControlX,
+                    firstControlY,
+                    secondControlX,
+                    secondControlY,
+                    currX,
+                    currY
+                )
             }
         }
+
+    }
+
+    override fun drawTranslated(
+        lastPoint: KEntity,
+        currPoint: KEntity,
+        lastX: Float,
+        currX: Float,
+        canvas: Canvas,
+        position: Int
+    ) {
 
     }
 

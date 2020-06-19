@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import com.github.klib.KlineConfig.TYPE_MAIN_CANDLE
 import com.github.klib.KlineConfig.TYPE_MAIN_TIME_LINE
 import com.github.klib.KlineConfig.TYPE_NULL_SUB
+import com.github.klib.draw.TimeLineView
 import com.github.klib.entity.DefValueFormatter
 import com.github.klib.entity.KEntity
 import com.github.klib.entity.KlineAttribute
@@ -592,22 +593,62 @@ abstract class BaseKChartView : ScaleScrollView {
         for (i in mStartIndex..mStopIndex) {
             val currentPoint = getItem(i) ?: return
             val currPointX = getXByIndex(i)
-            val lastPoint = if (i == 0) currentPoint else getItem(i - 1) ?: return
-            val lastPointX = if (i == 0) currPointX else getXByIndex(i - 1)
-            mMainView.drawTranslated(lastPoint, currentPoint, lastPointX, currPointX, canvas, i)
+            val prePrePosition: Int
+            val prePrePoint =
+                when (i) {
+                    0 -> {
+                        prePrePosition = i
+                        currentPoint
+                    }
+                    1 -> {
+                        prePrePosition = i - 1
+                        getItem(i - 1) ?: return
+                    }
+                    else -> {
+                        prePrePosition = i - 2
+                        getItem(i - 2)
+                            ?: return
+                    }
+                }
+            val prePosition: Int
+            val prePoint = if (i == 0) {
+                prePosition = i
+                currentPoint
+            } else {
+                prePosition = i - 1
+                getItem(i - 1) ?: return
+            }
+            val prePointX = if (i == 0) currPointX else getXByIndex(i - 1)
+
+            val nextPosition: Int
+            val nextPoint = if (i == mItemCount - 1) {
+                nextPosition = i
+                currentPoint
+            } else {
+                nextPosition = i + 1
+                getItem(i + 1) ?: return
+            }
+            if (mMainView is TimeLineView) {
+                mMainView.drawCubic(
+                    prePrePosition, prePrePoint, prePosition, prePoint,
+                    i, currentPoint, nextPosition, nextPoint, currPointX, canvas
+                )
+            } else {
+                mMainView.drawTranslated(prePoint, currentPoint, prePointX, currPointX, canvas, i)
+            }
             mVolumeView.drawTranslated(
-                lastPoint,
+                prePoint,
                 currentPoint,
-                lastPointX,
+                prePointX,
                 currPointX,
                 canvas,
                 i
             )
             if (subType != TYPE_NULL_SUB) {
                 mCurrSubView?.drawTranslated(
-                    lastPoint,
+                    prePoint,
                     currentPoint,
-                    lastPointX,
+                    prePointX,
                     currPointX,
                     canvas,
                     i

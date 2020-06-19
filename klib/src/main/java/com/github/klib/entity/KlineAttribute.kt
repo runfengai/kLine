@@ -52,5 +52,6 @@ data class KlineAttribute(
     var timeLineWidth: Float = 0f, //分时线颜色
     var timeLineColor: Int = 0, //分时线颜色
     var timeLineShaderColorTop: Int = 0, //分时线颜色
-    var timeLineShaderColorBtm: Int = 0 //分时线颜色
+    var timeLineShaderColorBtm: Int = 0, //分时线颜色
+    var besselIndicator: Float = 0.16f//贝塞尔曲线平滑程度指标
 ) : Serializable
